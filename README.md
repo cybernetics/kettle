@@ -31,19 +31,17 @@ Production Ready: false
 
 Plain HTML templates:
 ```html
-<div id="#todo">
-    <label>My Todos:</label>
-    <label>Add : </label>
+<div id="todos">
+    <h3>My Todos:</h3>
     <input type="text" data-kettle="newTodo"/>
     <button data-kettle="addTodo">Add Todo</button>
     <div data-kettle="todoList"></div>
-    <button data-kettle="removeAll">Remove All<button>
+    <button data-kettle="removeCompleted">Remove Completed</button>
 </div>
 
 <script id="item" type="text/template">
     <div>
         <input type="checkbox" data-kettle="completed"/>
-        <label>Todo:</label>
         <input type="text" data-kettle="title"/>
         <button data-kettle="remove">X</button>
     </div>
@@ -52,18 +50,21 @@ Plain HTML templates:
 
 The javascript:
 ```javascript
-var TodoItem = Kettle.Views.extend({
+$(function(){
+var TodoItem = Kettle.View.extend({
     el: '#item',
     "model.destroy" : function() {
         this.remove();
     },
-    "model.change:completed" : function(model, completed) {
-        this.$el.toggleClass('completed', completed);
-    },
     elements : {
         "completed" : 'model.completed',
 
-        "title" : 'model.title',
+        "title" : {
+            bind : 'model.title',
+            "model.change:completed" : function(model, completed) {
+                this.$el.prop('disabled', completed);
+            }
+        },
 
         "remove" : {
             "el.click" : function() {
@@ -73,7 +74,7 @@ var TodoItem = Kettle.Views.extend({
     }
 });
 
-var Todos = Kettle.Views.extend({
+var Todos = Kettle.View.extend({
     el: '#todos',
     state : { "newTodo": ''},
     elements : {
@@ -89,27 +90,33 @@ var Todos = Kettle.Views.extend({
                     title : this.state.get('newTodo'),
                     completed: false
                 });
+
+                this.state.set('newTodo', '');
             }
         },
 
-        "removeAll" : {
+        "removeCompleted" : {
             "el.click" : function() {
-                this.collection.reset();
+                _.invoke(this.collection.where({completed: true}), 'destroy');
             },
-            "collection[add remove reset]" : function() {
-                this.$el.toggle(this.collection.length >= 0);
+            "collection[add remove reset change:completed]" : function() {
+                this.$el.toggle(this.collection.where({completed : true}).length > 0);
             }
         }
+
     }
 });
 
-var tasks = {title: "Make js library", completed: true}, {title : "Make it production ready", completed: false};
+var tasks = [{title: "Make js library", completed: true}, {title : "Make it production ready", completed: false}];
 var todos = new Todos({collection: new Backbone.Collection(tasks), state: {newTodo: "What to do next?"}});
 
-var newTasks = {title: "Go outside." completed: false};
+var newTasks = [{title: "Go outside.", completed: false}];
 
 //swap the old collection with the new one, re-rending the view with the new task.
-todos.set('collection', new Backbone.Collection(newTasks)); 
+todos.set('collection', new Backbone.Collection(newTasks));
+
+});
+
 ```
 ## View
 

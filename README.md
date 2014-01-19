@@ -114,7 +114,7 @@ todos.set('collection', new Backbone.Collection(newTasks));
 ## View
 
 A *view* consists of any number of child *elements*. Each *element* of the *view*
-is it's own separate object responsible for only itself and should not be able to access any other *element*
+is its own separate object responsible for only itself and should not be able to access any other *element*
 of the *view*. (Although this is not strictly enforced).
 
 A *view* is represented by a single DOM element, each of the *view* child *elements* are also represented by a single DOM element that
@@ -163,7 +163,7 @@ This allows for swapping an *event object* under the same name, which will unbin
 to the new one. Individual *elements* of a *view* will have their own subscriptions but will share the *event objects* with their parent *view*.
 With the exception of the `'el'` *event object*, which is unique to each *element* and is its own `jQuery`/`Zepto` object.
 
-Aside from the `'el'` *event object* a *view* (and all of it's *elements*) also has the `'view'` *event object* which is the *view* itself.
+Aside from the `'el'` *event object* a *view* (and all of its *elements*) also has the `'view'` *event object* which is the *view* itself.
 
 *event objects* can be accessed from the `'eventObjects'` property on both the *view* and its *elements*.
 `'model'`, `'collection'` and `'state'`are also available as a direct property of the *view*/*element* for convenience, as they are most common.
@@ -191,7 +191,7 @@ Where the first parameter is the name and the second is the *event object*. Upon
 
 ## General Structure
 
-Kettle uses its own structure to define a *view* and it's *elements*. The structure attempts to give focus to each individual element and the 
+Kettle uses its own structure to define a *view* and its *elements*. The structure attempts to give focus to each individual element and the 
 events that they respond to.
 
 ### Events Structure
@@ -476,7 +476,7 @@ any time. Much like the *collection view*, a *container view* can listen to its 
 
 A *container view* can be defined on an element by including the `subview` property.
 
-By default a *sub view* will receive all the *event objects* of the *container view*, and will get them updated if ever the *container view* changes it's
+By default a *sub view* will receive all the *event objects* of the *container view*, and will get them updated if ever the *container view* changes its
 *event objects* (but not vise-versa).
 
 ```javascript
@@ -879,7 +879,7 @@ will get instantiated when a `subview` parameter is used in an element declarati
 `hasViewSubscription` : returns a boolean if a subscription to a given *sub view* *event object* exists.  
     the view should be inserted, by default its with `$el.append`.
 `remove` : remove the *container view* as well as the *sub view* it holds  from the DOM and unbinding all subscriptions.  
-`setSubView(view, synced)` : sets a new *sub view*, removing the old one if it exists and thus unbinding all it's subscriptions. If the synced option is set to
+`setSubView(view, synced)` : sets a new *sub view*, removing the old one if it exists and thus unbinding all its subscriptions. If the synced option is set to
     `true` than the subview will inherit all *event objects* of the *container view*  
 `subscribeViews(name, event, fn)` : subscribes to a new event on a *sub view* given the name of an event object, the event name and the function  
 `unsbscribeViews(name, event, fn, attribute)` : Unsubscribe from a *sub view* *event object* by name, you can also unsubscribe from specific events or functions  

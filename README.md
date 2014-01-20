@@ -107,10 +107,16 @@ var Todos = Kettle.View.extend({
     }
 });
 
-var tasks = [{title: "Make js library", completed: true}, {title : "Make it production ready", completed: false}];
-var todos = new Todos({collection: new Backbone.Collection(tasks), state: {newTodo: "What to do next?"}});
+var tasks = [
+    {title: "Make js library", completed: true}, 
+    {title : "Make it production ready", completed: false}
+];
 
-var newTasks = [{title: "Go outside.", completed: false}];
+var todos = new Todos({collection: new Backbone.Collection(tasks), state: {newTodo: "What's next?"}});
+
+var newTasks = [
+    {title: "Go outside.", completed: false}
+];
 
 //swap the old collection with the new one, re-rending the view with the new task.
 todos.set('collection', new Backbone.Collection(newTasks));
@@ -140,21 +146,33 @@ Example:
 
 ```javascript
 var View = Kettle.View.extend({
-    attr : 'data-kettle' //Specify the attribute used to identify child elements (default : data-kettle)
-    el: '#view', //The default template to use for this view
-    "el.click" : function() { //A click event bound to the parent DOM element (top most <div>);
-        console.log(this); //context here resolves to the view itself
-        console.log(this.$el); //the jquery object reprensting the view topmost DOM element
-        console.log(this.elements); //object that holds the refrences to all the individual element objects
+    //Specify the attribute used to identify child elements (default : data-kettle)
+    attr : 'data-kettle'
+    //The default template to use for this view
+    el: '#view', 
+    //A click event bound to the parent DOM element (top most <div>);
+    "el.click" : function() { 
+        //context here resolves to the view itself
+        console.log(this);
+        //the jquery object reprensting the view topmost DOM element
+        console.log(this.$el);
+         //object that holds the refrences to all the individual element objects
+        console.log(this.elements);
     },
-    elements : { //List of all the child dom elements that will automatically map to the ones found in the template
+    elements : { 
+        //List of all the child dom elements that will map to the ones found in the template
         "foo" : {
-            "el.click" : function(e) { //a click event bound to views child 'span' element
-                console.log(this); //context here resolves to child element object, not the parent view
-                console.log(this.$el); //this jquery object representing the child's DOM element, not the parent view element
-                console.log(this.view); //the parent view
+            //a click event bound to views child 'span' element
+            "el.click" : function(e) {
+                //context here resolves to child element object, not the parent view
+                console.log(this);
+                //this jquery object representing the child's DOM element, not the parent view element
+                console.log(this.$el);
+                //the parent view
+                console.log(this.view); 
             },
-            "model.change" : function() {} //a function to run when a change event fires on the 'model' eventObject
+            //a function to run when a change event fires on the 'model' eventObject
+            "model.change" : function() {} 
         }
     }
 });

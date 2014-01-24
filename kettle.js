@@ -1352,6 +1352,7 @@
             RBRACKET_NOTATION = /(.*?)\[(.*?)\]/,
             DOT_NOTATION = '.',
             EVENTS_NOTATION = '*',
+            PREFIXES = ['*'],
             KNOWN_PARAMETERS =  [
                                     'bind', 'subview', 'subviews', 'template', 'group', 'groups',
                                     'collection', 'model', 'eventObjects', 'state', 'attr', 'el',
@@ -1464,24 +1465,6 @@
             return extendConcat({}, secondary, primary);
         }
 
-        function link(from, to, props) {
-            var i, l, prop;
-
-            if (!_.isArray(props)) props = [props];
-
-            for (i = 0, l = props.length; i < l; i++) {
-                prop = props[i];
-                if (from[prop] !== undefined) {
-                    to[prop] = from[prop];
-                }
-            }
-        }
-
-        function acquireObj(obj,property,from) {
-            if (from && ( (_.isArray(from) && from.length) || (_.isObject(from) && !_.isEmpty(from)))) {
-                obj[property] = from;
-            }
-        }
 
         function exctractUnknownParams(params) {
             var extentions = {},
@@ -1500,13 +1483,13 @@
             return extentions;
         }
 
-        function extractModelEvents(params, viewevents) {
+        function extractModelEvents(params, prefix) {
             var dotIndex, parts, attIndex, event, eventName, attribute, bindings = [];
 
-            _.each(getEvents(params, viewevents ? EVENTS_NOTATION : null), function(eventFns, eventString){
+            _.each(getEvents(params, prefix), function(eventFns, eventString){
                 dotIndex = eventString.indexOf(DOT_NOTATION);
                 event = eventString.substring(0, dotIndex);
-                if (viewevents || event.substring(0, EVENTS_NOTATION.length) !== EVENTS_NOTATION) {
+                if (!_.contains(PREFIXES, event.substring(0,1))) {
                     parts = eventString.substring(dotIndex + 1);
                     parts = parts.split(":");
                     eventName = parts[0];
@@ -1612,10 +1595,18 @@
                     apiParams = {bind : apiParams};
                 }
 
-                link(apiParams,params, ['template', 'attr', 'defaults']);
+                _.each(['template', 'attr', 'defaults'], function(prop) {
+                    if (apiParams[prop] !== undefined) {
+                        params[prop] = apiParams[prop];
+                    }
+                });
 
-                acquireObj(params, 'bindings', extractModelEvents(apiParams) );
-                acquireObj(params, 'eventsviews', extractModelEvents(apiParams, true));
+                params.bindings = extractModelEvents(apiParams);
+                if (params.bindings.length === 0) delete params.bindings;
+
+                params.eventsviews = extractModelEvents(apiParams, EVENTS_NOTATION);
+                if (params.eventsviews.length === 0) delete params.eventsviews;
+
 
                 if (apiParams.setup) params.setup = _.isArray(apiParams.setup) ? apiParams.setup : [apiParams.setup];
 
@@ -1642,7 +1633,8 @@
                     params.subview = subview === true ? {} : _.extend({synced: true}, subview);
                 }
 
-                acquireObj(params, 'unknown', exctractUnknownParams(apiParams));
+                params.unknown = exctractUnknownParams(apiParams);
+                if (_.isEmpty(params.unknown)) delete params.unknown;
 
                 if (group && groups) {
                     var build = _.map(_.isArray(group) ? group : [group], function(g) {

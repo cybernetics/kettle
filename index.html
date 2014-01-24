@@ -31,15 +31,12 @@
 
       <section>
         <div id="title">
-          <h1>Kettle</h1>
-          <p>A different approach to building views using Backbone + jQuery</p>
+          <h1>kettle.js</h1>
           <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/smelnikov">smelnikov</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
 
         <h1>
-<a name="kettle" class="anchor" href="#kettle"><span class="octicon octicon-link"></span></a>Kettle</h1>
+<a name="kettle" class="anchor" href="#kettle"><span class="octicon octicon-link"></span></a></h1>
 
 <p>Kettle is a library for writing UI elements in javascript using Backbone's Model/Collection/Routers.</p>
 
@@ -62,7 +59,7 @@ user (click, mouseover,etc) or from a model/collection/router.</p>
 <p>Uncompressed size: 73761 bytes.<br>
 Compressed size: 4885 bytes gzipped (24117 bytes minified).<br>
 Version: 0.1<br>
-Production Ready: false  </p>
+</p>
 
 <h2>
 <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
@@ -88,8 +85,8 @@ Production Ready: false  </p>
     <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
         <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"checkbox"</span> <span class="nx">data</span><span class="o">-</span><span class="nx">kettle</span><span class="o">=</span><span class="s2">"completed"</span><span class="o">/&gt;</span>
         <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span> <span class="nx">data</span><span class="o">-</span><span class="nx">kettle</span><span class="o">=</span><span class="s2">"title"</span><span class="o">/&gt;</span>
-        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">data</span><span class="o">-</span><span class="nx">kettle</span><span class="o">=</span><span class="s2">"remove"</span><span class="o">&gt;</span><span class="nx">X</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
-    <span class="o">&lt;</span><span class="err">/div&gt;</span>
+        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">data</span><span class="o">-</span><span class="nx">kettle</span><span class="o">=</span><span class="s2">"remove"</span><span class="o">&gt;</span><span class="nx">X</span><span class="o">&lt;</span><span class="o">/button&gt;</span>
+    <span class="o">&lt;</span><span class="o">/div&gt;</span>
 <span class="nt">&lt;/script&gt;</span>
 </pre></div>
 
@@ -578,7 +575,7 @@ to be a <em>template view</em> set the <code>template</code> property on an elem
 Alternatively a selector can be used as well to grab the template from within another script tag.</p>
 
 <div class="highlight highlight-html"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"view"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">data-kettle=</span><span class="s">"contact"</span><span class="nt">&gt;</span>Name : <span class="err">&lt;</span>%= name %&gt; - Phone : <span class="err">&lt;</span>%= phone %&gt;<span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">data-kettle=</span><span class="s">"contact"</span><span class="nt">&gt;</span>Name : <span class="o">&lt;</span>%= name %&gt; - Phone : <span class="o">&lt;</span>%= phone %&gt;<span class="nt">&lt;div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
 
@@ -823,6 +820,7 @@ behaviour of the parent, any events that were subscribed to on the parent will a
 Anyone familiar with <code>Backbone.View</code> should feel right at home with <code>Kettle.BBView</code> the only caveat is that if a model or collection need
 to be changed on a <code>Kettle.BBView</code> it must be done via the <code>set</code> method. eg.: <code>bbView.set('model',newmodel)</code>;</p>
 
+<div id="api">
 <h2>
 <a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h2>
 
@@ -912,8 +910,11 @@ will get instantiated when a <code>subview</code> parameter is used in an elemen
 <code>remove</code> : remove the <em>container view</em> as well as the <em>sub view</em> it holds  from the DOM and unbinding all subscriptions.<br><code>setSubView(view, synced)</code> : sets a new <em>sub view</em>, removing the old one if it exists and thus unbinding all its subscriptions. If the synced option is set to
     <code>true</code> than the subview will inherit all <em>event objects</em> of the <em>container view</em><br><code>subscribeViews(name, event, fn)</code> : subscribes to a new event on a <em>sub view</em> given the name of an event object, the event name and the function<br><code>unsbscribeViews(name, event, fn, attribute)</code> : Unsubscribe from a <em>sub view</em> <em>event object</em> by name, you can also unsubscribe from specific events or functions<br>
     by providing further paremeters.</p>
+    </div>
       </section>
 
+    <span class="credits left">Project maintained by <a href="https://github.com/smelnikov">smelnikov</a></span>
+    <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     

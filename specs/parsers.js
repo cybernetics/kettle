@@ -187,6 +187,27 @@ describe("Element parsers: ", function() {
             });
     });
 
+    it("bind model events with a string", function() {
+        var binding = parse({"x.a" : 'method'}).bindings[0];
+        expect(typeof binding.fn=== 'function').toBe(true);
+
+        var ran = false;
+        var o = {method : function() {
+            expect(_.toArray(arguments)).toEqual([1,2,3]);
+            expect(this).toBe(o);
+            ran = true;
+        }};
+
+        binding.fn.apply(o, [1,2,3]);
+
+        expect(ran).toBe(true);
+
+    });
+
+    it("throws an error if invalid value is provided for an event", function(){
+        expect(function(){parse({"x.a" : 5})}).toThrow();
+    });
+
     it("binds events with attributes", function() {
         expect(parse({ "x.a" : fn, "x.a:b y.a:b" : fn}))
             .toEqual({

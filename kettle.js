@@ -1483,6 +1483,18 @@
             return extentions;
         }
 
+        function parseFn(fn) {
+            if (_.isFunction(fn)) {
+                return fn;
+            } else if (_.isString(fn)) {
+                return function() {
+                    this[fn].apply(this, arguments);
+                };
+            } else {
+                throwError("Not an acceptable value for an event method (must be a function or string");
+            }
+        }
+
         function extractModelEvents(params, prefix) {
             var dotIndex, parts, attIndex, event, eventName, attribute, bindings = [];
 
@@ -1497,10 +1509,10 @@
 
                     _.isArray(eventFns) ?
                         _.each(eventFns, function(fn) {
-                            bindings.push({name: event, event: eventName, fn: fn, attribute : attribute});
+                            bindings.push({name: event, event: eventName, fn: parseFn(fn), attribute : attribute});
                         })
                         :
-                        bindings.push({name: event, event: eventName, fn: eventFns, attribute : attribute});
+                        bindings.push({name: event, event: eventName, fn: parseFn(eventFns), attribute : attribute});
                 }
 
             });

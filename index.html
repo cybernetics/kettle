@@ -1,0 +1,921 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Kettle by smelnikov</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/smelnikov/kettle">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/smelnikov/kettle/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/smelnikov/kettle/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Kettle</h1>
+          <p>A different approach to building views using Backbone + jQuery</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/smelnikov">smelnikov</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="kettle" class="anchor" href="#kettle"><span class="octicon octicon-link"></span></a>Kettle</h1>
+
+<p>Kettle is a library for writing UI elements in javascript using Backbone's Model/Collection/Routers.</p>
+
+<h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
+
+<p>The Kettle library attempts to facilitate a different approach to writing views, where each view is seen as a set of independent elements that share a common model(s)
+and are mapped 1:1 to a DOM Element.</p>
+
+<p>Each element is thought of as a separate unit that performs a very specific role within a view, it does so by responding to events. These events would typically come from the
+user (click, mouseover,etc) or from a model/collection/router.</p>
+
+<p>This approach allows for views to be declarative , decoupled and efficient at rendering and re-rending themselves upon change.</p>
+
+<p>Have a look at 'examples/todoMVC' for an example and a general idea of how this achieved with Kettle.</p>
+
+<h2>
+<a name="sizeversion" class="anchor" href="#sizeversion"><span class="octicon octicon-link"></span></a>Size/Version</h2>
+
+<p>Uncompressed size: 73761 bytes.<br>
+Compressed size: 4885 bytes gzipped (24117 bytes minified).<br>
+Version: 0.1<br>
+Production Ready: false  </p>
+
+<h2>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<ul>
+<li>underscore/lodash</li>
+<li>jQuery/Zepto</li>
+<li>Backbone</li>
+</ul><h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<p>Plain HTML templates:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"todos"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h3&gt;</span>My Todos:<span class="nt">&lt;/h3&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">data-kettle=</span><span class="s">"newTodo"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">data-kettle=</span><span class="s">"addTodo"</span><span class="nt">&gt;</span>Add Todo<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">data-kettle=</span><span class="s">"todoList"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">data-kettle=</span><span class="s">"removeCompleted"</span><span class="nt">&gt;</span>Remove Completed<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;script </span><span class="na">id=</span><span class="s">"item"</span> <span class="na">type=</span><span class="s">"text/template"</span><span class="nt">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"checkbox"</span> <span class="nx">data</span><span class="o">-</span><span class="nx">kettle</span><span class="o">=</span><span class="s2">"completed"</span><span class="o">/&gt;</span>
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span> <span class="nx">data</span><span class="o">-</span><span class="nx">kettle</span><span class="o">=</span><span class="s2">"title"</span><span class="o">/&gt;</span>
+        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">data</span><span class="o">-</span><span class="nx">kettle</span><span class="o">=</span><span class="s2">"remove"</span><span class="o">&gt;</span><span class="nx">X</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
+    <span class="o">&lt;</span><span class="err">/div&gt;</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>The javascript:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+<span class="kd">var</span> <span class="nx">TodoItem</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">el</span><span class="o">:</span> <span class="s1">'#item'</span><span class="p">,</span>
+    <span class="s2">"model.destroy"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+    <span class="p">},</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"completed"</span> <span class="o">:</span> <span class="s1">'model.completed'</span><span class="p">,</span>
+
+        <span class="s2">"title"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">bind</span> <span class="o">:</span> <span class="s1">'model.title'</span><span class="p">,</span>
+            <span class="s2">"model.change:completed"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">completed</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">prop</span><span class="p">(</span><span class="s1">'disabled'</span><span class="p">,</span> <span class="nx">completed</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+
+        <span class="s2">"remove"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">Todos</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">el</span><span class="o">:</span> <span class="s1">'#todos'</span><span class="p">,</span>
+    <span class="nx">state</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">"newTodo"</span><span class="o">:</span> <span class="s1">''</span><span class="p">},</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"newTodo"</span><span class="o">:</span> <span class="s1">'state.newTodo'</span><span class="p">,</span>
+
+        <span class="s2">"todoList"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">subviews</span> <span class="o">:</span> <span class="nx">TodoItem</span>
+        <span class="p">},</span>
+
+        <span class="s2">"addTodo"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span>
+                    <span class="nx">title</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'newTodo'</span><span class="p">),</span>
+                    <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span>
+                <span class="p">});</span>
+
+                <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'newTodo'</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+
+        <span class="s2">"removeCompleted"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">_</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="nx">completed</span><span class="o">:</span> <span class="kc">true</span><span class="p">}),</span> <span class="s1">'destroy'</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="s2">"collection[add remove reset change:completed]"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="nx">completed</span> <span class="o">:</span> <span class="kc">true</span><span class="p">}).</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">tasks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="nx">title</span><span class="o">:</span> <span class="s2">"Make js library"</span><span class="p">,</span> <span class="nx">completed</span><span class="o">:</span> <span class="kc">true</span><span class="p">},</span> 
+    <span class="p">{</span><span class="nx">title</span> <span class="o">:</span> <span class="s2">"Make it production ready"</span><span class="p">,</span> <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span><span class="p">}</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">todos</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Todos</span><span class="p">({</span><span class="nx">collection</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">(</span><span class="nx">tasks</span><span class="p">),</span> <span class="nx">state</span><span class="o">:</span> <span class="p">{</span><span class="nx">newTodo</span><span class="o">:</span> <span class="s2">"What's next?"</span><span class="p">}});</span>
+
+<span class="kd">var</span> <span class="nx">newTasks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="nx">title</span><span class="o">:</span> <span class="s2">"Go outside."</span><span class="p">,</span> <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span><span class="p">}</span>
+<span class="p">];</span>
+
+<span class="c1">//swap the old collection with the new one, re-rending the view with the new task.</span>
+<span class="nx">todos</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">(</span><span class="nx">newTasks</span><span class="p">));</span>
+
+<span class="p">});</span>
+
+</pre></div>
+
+<h2>
+<a name="view" class="anchor" href="#view"><span class="octicon octicon-link"></span></a>View</h2>
+
+<p>A <em>view</em> consists of any number of child <em>elements</em>. Each <em>element</em> of the <em>view</em>
+is its own separate object responsible for only itself and should not be able to access any other <em>element</em>
+of the <em>view</em>. (Although this is not strictly enforced).</p>
+
+<p>A <em>view</em> is represented by a single DOM element, each of the <em>view</em> child <em>elements</em> are also represented by a single DOM element that
+are contained within the <em>view</em> DOM element</p>
+
+<p>A <em>view</em> requires a plain html template in order to be rendered, a template can either be provided on the <em>view</em>
+definition, the instantiation, or both, with the template provided on instantiation taking precedence.</p>
+
+<p>Example:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"view"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;span</span> <span class="na">data-kettle=</span><span class="s">"foo"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">View</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">//Specify the attribute used to identify child elements (default : data-kettle)</span>
+    <span class="nx">attr</span> <span class="o">:</span> <span class="s1">'data-kettle'</span>
+    <span class="c1">//The default template to use for this view</span>
+    <span class="nx">el</span><span class="o">:</span> <span class="s1">'#view'</span><span class="p">,</span> 
+    <span class="c1">//A click event bound to the parent DOM element (top most &lt;div&gt;);</span>
+    <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+        <span class="c1">//context here resolves to the view itself</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+        <span class="c1">//the jquery object reprensting the view topmost DOM element</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">);</span>
+         <span class="c1">//object that holds the refrences to all the individual element objects</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">elements</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span> 
+        <span class="c1">//List of all the child dom elements that will map to the ones found in the template</span>
+        <span class="s2">"foo"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="c1">//a click event bound to views child 'span' element</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">//context here resolves to child element object, not the parent view</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+                <span class="c1">//this jquery object representing the child's DOM element, not the parent view element</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">);</span>
+                <span class="c1">//the parent view</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">view</span><span class="p">);</span> 
+            <span class="p">},</span>
+            <span class="c1">//a function to run when a change event fires on the 'model' eventObject</span>
+            <span class="s2">"model.change"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span> 
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="event-objects" class="anchor" href="#event-objects"><span class="octicon octicon-link"></span></a>Event Objects</h2>
+
+<p>A <em>view</em> can have any number of subscriptions to any number of <em>event objects</em>.
+<em>event objects</em> are javascript objects that can trigger events. They are the core of a Kettle <em>view</em>.
+Currently that includes anything that mixes in with <code>Backbone.Events</code> or that is a <code>jQuery</code>/<code>Zepto</code> object.</p>
+
+<p>A <em>view</em> subscribes to events by referencing an <em>event object</em> by name. The view holds a record of each event that it subscribes to.
+This allows for swapping an <em>event object</em> under the same name, which will unbind all subscribed events on the old <em>event object</em> and binding them
+to the new one. Individual <em>elements</em> of a <em>view</em> will have their own subscriptions but will share the <em>event objects</em> with their parent <em>view</em>.
+With the exception of the <code>'el'</code> <em>event object</em>, which is unique to each <em>element</em> and is its own <code>jQuery</code>/<code>Zepto</code> object.</p>
+
+<p>Aside from the <code>'el'</code> <em>event object</em> a <em>view</em> (and all of its <em>elements</em>) also has the <code>'view'</code> <em>event object</em> which is the <em>view</em> itself.</p>
+
+<p><em>event objects</em> can be accessed from the <code>'eventObjects'</code> property on both the <em>view</em> and its <em>elements</em>.
+<code>'model'</code>, <code>'collection'</code> and <code>'state'</code>are also available as a direct property of the <em>view</em>/<em>element</em> for convenience, as they are most common.</p>
+
+<p><em>event objects</em> can be set upon instantiation of a view :</p>
+
+<div class="highlight highlight-javascript"><pre><span class="k">new</span> <span class="nx">View</span><span class="p">({</span><span class="nx">eventObjects</span><span class="o">:</span> <span class="p">{</span> <span class="nx">someModel</span><span class="o">:</span> <span class="nx">aModel</span><span class="p">,</span> <span class="nx">someCollection</span><span class="o">:</span> <span class="nx">a</span> <span class="nx">Collection</span><span class="p">}});</span>
+</pre></div>
+
+<p>The <code>'model'</code>, <code>'collection'</code> and <code>'state'</code> event Objects can also be passed at the root of the options object.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="k">new</span> <span class="nx">View</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span> <span class="nx">aModel</span><span class="p">});</span> <span class="c1">//same as bellow</span>
+<span class="k">new</span> <span class="nx">View</span><span class="p">({</span><span class="nx">eventObjects</span> <span class="o">:</span> <span class="p">{</span><span class="nx">model</span><span class="o">:</span> <span class="nx">aModel</span><span class="p">}});</span>
+</pre></div>
+
+<p><em>event objects</em> can also be set via the <code>set</code> method after instantiation:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">view</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'model'</span><span class="p">,</span> <span class="nx">newModel</span><span class="p">);</span>
+</pre></div>
+
+<p>Where the first parameter is the name and the second is the <em>event object</em>. Upon setting a new <em>event object</em> the view will re-render itself accordingly.</p>
+
+<h2>
+<a name="general-structure" class="anchor" href="#general-structure"><span class="octicon octicon-link"></span></a>General Structure</h2>
+
+<p>Kettle uses its own structure to define a <em>view</em> and its <em>elements</em>. The structure attempts to give focus to each individual element and the 
+events that they respond to.</p>
+
+<h3>
+<a name="events-structure" class="anchor" href="#events-structure"><span class="octicon octicon-link"></span></a>Events Structure</h3>
+
+<p>When defining a <em>view</em>, events can be written in either dot or bracket notation.</p>
+
+<h4>
+<a name="dot-notation" class="anchor" href="#dot-notation"><span class="octicon octicon-link"></span></a>Dot Notation</h4>
+
+<p><code>eventObject.eventName</code></p>
+
+<p>Events can be bound to a <em>view</em> or its <em>elements</em> using the dot notation. Where the name before the dot is the name of the
+<em>event object</em>. The word after the dot is the name of the event, For example: <code>model.change</code> or <code>model.change:attribute</code></p>
+
+<h4>
+<a name="bracket-notation" class="anchor" href="#bracket-notation"><span class="octicon octicon-link"></span></a>Bracket Notation</h4>
+
+<p><code>eventObject[eventName1 eventName2]</code></p>
+
+<p>Events can also be bound using the bracket notation. This allows for easily binding multiple events on the same <em>event object</em>.
+The word before the brackets is the name of the <em>event object</em> while the words in the brackets, which are separate by a space
+are the event names. For example: 'collection[add remove reset]'</p>
+
+<h3>
+<a name="properties" class="anchor" href="#properties"><span class="octicon octicon-link"></span></a>Properties</h3>
+
+<p>Below is a list of valid properties that can be defined on a <em>view</em>/<em>elements</em></p>
+
+<h4>
+<a name="on-both-the-view-and-element" class="anchor" href="#on-both-the-view-and-element"><span class="octicon octicon-link"></span></a>On both the <em>view</em> and <em>element</em>
+</h4>
+
+<p>dot-notation events: events bound to the view/element in the dot-notation.<br>
+bracket-notation events: events bound to the view/element in the bracket-notation<br><code>group</code>: a group or array of groups that the view/element inherits its behavior from<br><code>setup</code>: a method (or array of methods) that will be called after this element/view has been instantiated, typically to modify <code>el</code>  </p>
+
+<h4>
+<a name="only-on-the-view" class="anchor" href="#only-on-the-view"><span class="octicon octicon-link"></span></a>Only on the <em>view</em>:</h4>
+
+<p><code>state</code> : an object literal of all the default values that get initially set for the view's state model.<br><code>model</code> : the primary model Constructor of the view (if applicable, used for type-checking)<br><code>collection</code> : the primary collection Constructor of the view (if applicable, used for type checking)<br><code>eventobjects</code> : an object literal of all other <em>event objects</em> Constructors<br><code>elements</code> : the list of elements belonging to the view<br><code>groups</code> : a list of groups belonging to the view<br><code>attr</code> : the attribute used to load the <em>elements</em> from the template (default 'data-kettle')<br><code>el</code> : the default element/template to use for this view<br><code>initialize(args)</code> : the initialization function to be called for the view, with the parameters passed in from <code>new</code>  </p>
+
+<h4>
+<a name="only-on-the-element" class="anchor" href="#only-on-the-element"><span class="octicon octicon-link"></span></a>Only on the <em>element</em>:</h4>
+
+<p><code>bind</code>: a string in the notation of <code>eventObject.attribute</code> or an object literal containing options for two way binding.<br><code>subviews</code>: 'either a flag, an object literal with options or a view constructor, which indicate that this element is a view collection<br><code>subview</code>: either a flag, an object literal with options or a view constructor, which indicate that this element is a view container<br><code>template</code>: a flag or a selector indicating that this element is a template  </p>
+
+<p>Note: only one of <code>bind</code>, <code>subview</code>, <code>subviews</code>, <code>template</code> can exists on an individual element.  </p>
+
+<h3>
+<a name="other-properties" class="anchor" href="#other-properties"><span class="octicon octicon-link"></span></a>Other Properties</h3>
+
+<p>Properties that are not expected by the Kettle parsers (any property not listed in the above), will added to the instance instead.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">View</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="s1">'foo'</span> <span class="o">:</span> <span class="s1">'bar'</span><span class="p">,</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">View</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">view</span><span class="p">);</span> <span class="c1">//bar</span>
+</pre></div>
+
+<h2>
+<a name="view-state" class="anchor" href="#view-state"><span class="octicon octicon-link"></span></a>View State</h2>
+
+<p>At times your <em>view</em> will require its own state, one which is specific to the <em>view</em> and thus does not belong on a model. For example,
+a folder view may have a display state, where the values can either be 'minimal' or 'detailed'. If you specify a <code>state</code> property
+within the <em>view</em> than Kettle will automatically create a <code>Backbone.Model</code> for you which will represent the view state.
+You can then use the state like you would any other model.</p>
+
+<p>Example: </p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">FolderView</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">state</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">display</span><span class="o">:</span> <span class="s1">'detailed'</span>
+    <span class="p">},</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">icon</span> <span class="o">:</span> <span class="p">{</span><span class="cm">/*...*/</span><span class="p">},</span>
+        <span class="nx">name</span> <span class="o">:</span> <span class="p">{</span><span class="cm">/*...*/</span><span class="p">},</span>
+        <span class="nx">filesize</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"state.change:display"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">state</span><span class="p">,</span> <span class="nx">display</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">display</span> <span class="o">===</span> <span class="s1">'detailed'</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">folder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FolderView</span><span class="p">({</span><span class="nx">state</span> <span class="o">:</span> <span class="p">{</span><span class="nx">display</span> <span class="o">:</span> <span class="s1">'minimal'</span><span class="p">}});</span>
+</pre></div>
+
+<p>Since a state is just a Backbone.Model it can be passed around from one view to another, in order to share state or to load your view
+in a particular starting state. Or to have a mediator/controller listen in to the state of a view and perform an action when there's a change.</p>
+
+<h2>
+<a name="view-events" class="anchor" href="#view-events"><span class="octicon octicon-link"></span></a>View Events</h2>
+
+<p>A view extends from Backbone.Events and triggers some built in events:</p>
+
+<p><code>change (view, name, newEventObject, oldEventObject)</code> - When an <em>event object</em> has been changed<br><code>change:name (view, newEventObject, oldEventObject)</code> - When a specific <em>event object</em> has been changed, e.g.: <code>change:model</code><br><code>render (view)</code> - When the view has been rendered<br><code>remove (view)</code> - When a view has been removed  </p>
+
+<h2>
+<a name="groups" class="anchor" href="#groups"><span class="octicon octicon-link"></span></a>Groups</h2>
+
+<p>At times you will have multiple <em>elements</em> that perform the same action for a particular event, these <em>elements</em> can be
+logically grouped together so that they can share behaviors:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"saveButton"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"model.change:editing"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">editing</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">editing</span> <span class="o">===</span> <span class="kc">true</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><span class="c1">//save logic}</span>
+        <span class="p">},</span>
+        <span class="s2">"deleteButton"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"model.change:editing"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">editing</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">editing</span> <span class="o">===</span> <span class="kc">true</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><span class="c1">//delete logic}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>In the above example both the save and delete buttons get their visibility toggled when the editing attribute on the model
+changes, resulting in duplicated code. Since both of these <em>elements</em> appear to share behaviour we can group them together.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">groups</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"editableItem"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"model.change:editing"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">editing</span><span class="p">)</span> <span class="p">{</span> 
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">editing</span> <span class="o">===</span> <span class="kc">true</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"saveButton"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">group</span><span class="o">:</span> <span class="s1">'editableItem'</span><span class="p">,</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><span class="c1">//save logic}</span>
+        <span class="p">},</span>
+        <span class="s2">"deleteButton"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">group</span><span class="o">:</span> <span class="s1">'editableItem'</span><span class="p">,</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><span class="c1">//delete logic}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>In the above example we group the save and delete buttons together and have them share common functionality.
+An <em>element</em> can also belong to a list of groups by specifying the groups within an Array.</p>
+
+<h3>
+<a name="global-groups" class="anchor" href="#global-groups"><span class="octicon octicon-link"></span></a>Global Groups</h3>
+
+<p>Groups can also be defined on a global level to be available to every View. This can be done with the <code>setGroup(groupName, data)</code>
+on the <code>Kettle</code> object. e.g. <code>Kettle.setGroup('global-group', {})</code>, There are also <code>getGroup(groupName)</code> and <code>removeGroup(groupName)</code>
+if you need to modify existing groups.</p>
+
+<h3>
+<a name="anonymous-groups" class="anchor" href="#anonymous-groups"><span class="octicon octicon-link"></span></a>Anonymous Groups</h3>
+
+<p>An <em>element</em> can also share functionality without formally defining a group, by using space separated property names:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"saveButton deleteButton"</span> <span class="o">:</span> <span class="p">{</span>
+           <span class="s2">"model.change:editing"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">editing</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">editing</span> <span class="o">===</span> <span class="kc">true</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">"saveButton"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><span class="c1">//save logic}</span>
+        <span class="p">},</span>
+        <span class="s2">"deleteButton"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><span class="c1">//delete logic}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="multi-property-declarations" class="anchor" href="#multi-property-declarations"><span class="octicon octicon-link"></span></a>Multi-Property declarations</h2>
+
+<p>Multiple properties of an <em>element</em> can also share the same value by separating the properties with a space.</p>
+
+<p>Example demonstrating making an event alias.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"list"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">subviews</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="s2">"collection.add addItem"</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">addView</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span> <span class="nx">model</span><span class="p">});</span>
+            <span class="p">},</span>
+            <span class="s2">"collection.reset"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">addItem</span><span class="p">,</span><span class="k">this</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Example demonstrating binding multiple events to the same method</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+    <span class="s2">"model1.change model2.change"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">val</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="view-collection" class="anchor" href="#view-collection"><span class="octicon octicon-link"></span></a>View Collection</h2>
+
+<p>A <em>collection view</em> manages a variable number of <em>sub views</em>, a <em>collection view</em> can be defined by setting the <code>subviews</code> property on an element
+declaration. It will typically manage <em>sub views</em> automatically for you given a <code>Backbone.Collection</code>. Events such as <code>add</code>, <code>remove</code>, <code>reset</code> 
+and <code>sort</code> will be handled by the <em>collection view</em>. By default the <em>collection view</em> will assume to operate on a <code>Backbone.Collection</code>
+called <code>"collection"</code> and a model called <code>"model"</code> on each of the <em>sub views</em>. Manual control of <em>sub views</em> may also be enabled.</p>
+
+<p>A <code>ViewCollections</code> is also able to listen to events on any <em>event object</em> of the added <em>sub views</em>. To listen to a <em>sub views</em> <em>event object</em>
+prepend an event in dot or bracket notation with a '*' character.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"list"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">subviews</span><span class="o">:</span> <span class="nx">AView</span> <span class="c1">//Where "AView" is a view constructor</span>
+            <span class="s2">"*view.change"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">view</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"This event came from a subview"</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="s2">"*model.change"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span><span class="nx">value</span><span class="p">){</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"This event came from a subview's 'model' eventObject"</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="s2">"*el.click"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"This event came from a subviews DOM element"</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+</pre></div>
+
+<p>If you need to specify how the <em>sub views</em> gets constructed than you can use the <code>create</code> property:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"list"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">subviews</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="nx">create</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="k">new</span> <span class="nx">AView</span><span class="p">({</span><span class="nx">model</span> <span class="o">:</span> <span class="nx">model</span><span class="p">});</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>The <code>create</code> property is a function that accepts a <code>Backbone.Model</code> and expects a new <em>view</em> to be returned, this way you can control exactly how
+each <em>view</em> in the <em>collection view</em> gets instantiated.</p>
+
+<p>Other options that can be part of the <code>subviews</code> are:</p>
+
+<p><code>View</code> : the <em>view</em> constructor to be used for automatic instantiation by the <em>collection view</em><br><code>create</code>: the function used to instantiate new views in the <em>collection view</em> given a <code>Backbone.Model</code><br><code>collection</code>: the name of the <code>Backbone.Collection</code> <em>event object</em> that will be used to manage <em>sub views</em>. default : <code>'collection'</code><br><code>model</code> : the name of the model used by each <em>sub view</em>. default: <code>'model'</code><br><code>empty</code>: A <em>view</em> that will be displayed if there are no <em>sub views</em> currently in the <em>collection view</em>  </p>
+
+<p>Note: if you wish to manually manage <em>sub views</em> without having events automatically bound for you, you can do so by omitting either
+the <code>create</code> or <code>view</code> properties, or by simply setting <code>subviews : true</code></p>
+
+<h2>
+<a name="view-container" class="anchor" href="#view-container"><span class="octicon octicon-link"></span></a>View Container</h2>
+
+<p>A <em>container view</em> can hold exactly one <em>view</em>. That <em>view</em> can either be predetermined upon instantiation or after. It can be swapped for another <em>view</em> at
+any time. Much like the <em>collection view</em>, a <em>container view</em> can listen to its child <em>view</em> for any events it emits or any events emitted by the
+<em>event objects</em> it has. </p>
+
+<p>A <em>container view</em> can be defined on an element by including the <code>subview</code> property.</p>
+
+<p>By default a <em>sub view</em> will receive all the <em>event objects</em> of the <em>container view</em>, and will get them updated if ever the <em>container view</em> changes its
+<em>event objects</em> (but not vise-versa).</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"container"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">subview</span> <span class="o">:</span> <span class="nx">AView</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>If you need to specify how the <em>sub view</em> gets constructed than you can use the <code>'set'</code> property:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"container"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">subview</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="nx">set</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="k">new</span> <span class="nx">AView</span><span class="p">();</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Other options that can be passed into the <code>subview</code> are :</p>
+
+<p><code>View</code>: the view constructor to be used for automatic instantiation by the container
+<code>set</code>: the function used to instantiate a new <em>view</em> in the container
+<code>sync</code>: whether the <em>sub view</em> will automatically possess the <em>event objects</em> of the <em>container view</em></p>
+
+<p>Note: to not set any <em>sub view</em> initially but to indicate that the <em>element</em> is indeed a <em>container view</em> you can set the <code>subview</code> property to <code>true</code>.</p>
+
+<h2>
+<a name="template-view" class="anchor" href="#template-view"><span class="octicon octicon-link"></span></a>Template View</h2>
+
+<p>A <em>template view</em> is a view that is able to render a template (by default underscore templates). <em>template view</em> is a good fit for when you have DOM elements
+that are tied to model attributes but with little interaction. On a <em>template view</em> events can only be easily bound on the top level element. To enable an element
+to be a <em>template view</em> set the <code>template</code> property on an element definition. A value of <code>true</code> will grab the template code from inside the DOM element.
+Alternatively a selector can be used as well to grab the template from within another script tag.</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"view"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">data-kettle=</span><span class="s">"contact"</span><span class="nt">&gt;</span>Name : <span class="err">&lt;</span>%= name %&gt; - Phone : <span class="err">&lt;</span>%= phone %&gt;<span class="nt">&lt;div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+   <span class="nx">el</span><span class="o">:</span> <span class="s1">'#view'</span><span class="p">,</span>
+   <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">name</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">template</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="s2">"model.change"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">renderTemplate</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">());</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">View</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span> <span class="p">{</span><span class="nx">name</span> <span class="o">:</span> <span class="s2">"Jane Doe"</span><span class="p">,</span> <span class="nx">phone</span> <span class="o">:</span> <span class="s2">"555-5555"</span><span class="p">}});</span>
+</pre></div>
+
+<h2>
+<a name="two-way-binding" class="anchor" href="#two-way-binding"><span class="octicon octicon-link"></span></a>Two-way binding</h2>
+
+<p>Two-way binding in Kettle can be enabled by setting the bind property to an object within an element definition.</p>
+
+<p>The properties that can be set on the bind object are:<br>
+    'eventObject' - the name of the eventObject that that the binding will apply to. default : 'model'<br>
+    'attribute' - the name of the attribute that will be two-way binded on the eventObject. default : same as element name.<br>
+    'domEvent' - the dom event that needs to get trigged for the eventObject to get updated. default: 'change'  </p>
+
+<p>Note: as a convenience if the bind value is set to <code>true</code> it is equivalent to <code>{}</code>, meaning all default values will be used.  </p>
+
+<p>A string will also be accepted in the format <code>model.attribute</code>, where 'model' is the name of the <em>event object</em> and 'attribute' is
+the attribute that you wish to bind to on it.</p>
+
+<h3>
+<a name="custom-binding-methods" class="anchor" href="#custom-binding-methods"><span class="octicon octicon-link"></span></a>Custom binding methods</h3>
+
+<p>You can also declare your own functions that describe how a model attribute binds to a DOM element and vice-versa. This can be
+useful when dealing with a <code>jQuery</code> widget for example.</p>
+
+<p>To override the default behaviour of 2-way binding you can use the following properties within a <code>bind</code>:<br><code>fromDOM</code> - a function that given an object containing binding data will return a function that performs the binding from DOM-&gt;Model<br><code>fromModel</code> - a function that given an object containing binding data will return a function that performs the binding from Model-&gt;DOM  </p>
+
+<p>Example: you want to use the <code>jQuery</code> datepicker widget for a date field and store the values as epoch times in your model  </p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">setGroup</span><span class="p">(</span><span class="s2">"datepicker"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">setup</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">datepicker</span><span class="p">();</span>
+    <span class="p">},</span>
+    <span class="nx">bind</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">fromDOM</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">binding</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">epoch</span> <span class="o">=</span> <span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">datepicker</span><span class="p">(</span><span class="s2">"getTime"</span><span class="p">),</span>
+                    <span class="nx">model</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">eventObject</span><span class="p">[</span><span class="nx">binding</span><span class="p">.</span><span class="nx">eventObject</span><span class="p">];</span>
+
+                <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">binding</span><span class="p">.</span><span class="nx">attribute</span><span class="p">,</span> <span class="nx">epoch</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nx">fromModel</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">binding</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">epoch</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">datepicker</span><span class="p">(</span><span class="s2">"setTime"</span><span class="p">,</span> <span class="nx">epoch</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"date1"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">group</span><span class="o">:</span> <span class="s1">'datepicker'</span><span class="p">,</span>
+            <span class="nx">bind</span><span class="o">:</span> <span class="s1">'model.startDate'</span>
+        <span class="p">},</span>
+        <span class="s2">"date2"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">group</span> <span class="o">:</span> <span class="s1">'datepicker'</span><span class="p">,</span>
+            <span class="nx">bind</span><span class="o">:</span> <span class="s1">'model.endDate'</span><span class="p">,</span>
+
+        <span class="p">},</span>
+        <span class="s2">"date3"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">group</span> <span class="o">:</span> <span class="s1">'datepicker'</span><span class="p">,</span>
+            <span class="nx">bind</span><span class="o">:</span> <span class="s1">'model.otherDate'</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+</pre></div>
+
+<h2>
+<a name="view-rendering" class="anchor" href="#view-rendering"><span class="octicon octicon-link"></span></a>View Rendering</h2>
+
+<p>The render method on a <em>view</em> is optional, meaning a <em>view</em> is able to render itself by default based
+on the events it responds to. During the rending phase the <em>view</em> is bootstrapped by running certain
+event delegated methods, these methods are ran as though they are originated from the <em>event object</em> itself.
+Essentially they are "faked" for the purpose of bootstrapping the <em>view</em> in the proper initial state.</p>
+
+<p>Note: When events are faked during the rendering phase the 'bootstrap' property
+in the options object is present and set to 'true', in case the event delegated method ever
+needs to distinguish between a real and "fake" event.</p>
+
+<h3>
+<a name="rendering-events" class="anchor" href="#rendering-events"><span class="octicon octicon-link"></span></a>Rendering Events</h3>
+
+<p>Upon initialization, any <em>view</em> or <em>element</em> that subscribe the following events will automatically be called.</p>
+
+<h4>
+<a name="backbonemodel" class="anchor" href="#backbonemodel"><span class="octicon octicon-link"></span></a>Backbone.Model</h4>
+
+<ul>
+<li><code>change</code></li>
+<li><code>change:*</code></li>
+<li>
+<code>add</code> (only if part of a collection)</li>
+<li><code>all</code></li>
+</ul><h4>
+<a name="backbonecollection" class="anchor" href="#backbonecollection"><span class="octicon octicon-link"></span></a>Backbone.Collection</h4>
+
+<ul>
+<li><code>reset</code></li>
+<li><code>all</code></li>
+</ul><h4>
+<a name="backbonerouter" class="anchor" href="#backbonerouter"><span class="octicon octicon-link"></span></a>Backbone.Router</h4>
+
+<ul>
+<li>
+<code>route</code> (only called if the last called route was triggered by the same router)</li>
+<li>
+<code>route:*</code> (same as above but also if the route matches the last called route)</li>
+</ul><h2>
+<a name="event-execution-order" class="anchor" href="#event-execution-order"><span class="octicon octicon-link"></span></a>Event Execution Order</h2>
+
+<p>Events attached to a <em>view</em> or its <em>elements</em> are not guaranteed to execute in any particular order. Therefore your methods should not
+rely on any kind of order of execution. The only order that is guaranteed is that events on the <em>view</em> will execute before any of
+the child <em>elements</em>.</p>
+
+<h2>
+<a name="global-event-objects" class="anchor" href="#global-event-objects"><span class="octicon octicon-link"></span></a>Global Event Objects</h2>
+
+<p>If your application has a global <em>event object</em>, such as the <code>Backbone</code> event bus or a app model, you can can have it
+automatically be accessible to every created <em>view</em> using <code>Kettle.setGlobal</code>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettle</span><span class="p">.</span><span class="nx">setGlobal</span><span class="p">(</span><span class="s1">'Bus'</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">View</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="s2">"Bus.log"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">View</span><span class="p">();</span>
+<span class="nx">Backbone</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s2">"log"</span><span class="p">,</span> <span class="s2">"foo"</span><span class="p">);</span>
+</pre></div>
+
+<h2>
+<a name="other-kettle-objects" class="anchor" href="#other-kettle-objects"><span class="octicon octicon-link"></span></a>Other Kettle Objects</h2>
+
+<p>The <code>Kettle.View</code> object may  have <em>elements</em> that are a <em>collection view</em>, <em>container view</em>,<em>template view</em>, etc, but you can also
+declare each of those things as its own separate entity. For example if you just want to have a <em>collection view</em> with
+out any other elements you can extend <code>Kettle.ViewCollection</code>, or if you wish to render a simple template you extend a
+<code>Kettle.TemplateView</code>, etc. Upon extension, the constructors that get returned can even be used as a value to an <em>element</em> in a <em>view</em>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">List</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">CollectionView</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">el</span><span class="o">:</span> <span class="s2">"#list"</span><span class="p">,</span>
+    <span class="nx">subviews</span> <span class="o">:</span> <span class="nx">Item</span><span class="p">,</span>
+    <span class="s2">"collection.change"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{},</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">View</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">el</span><span class="o">:</span> <span class="s2">"#view"</span><span class="p">,</span>
+    <span class="nx">elements</span> <span class="o">:</span><span class="p">{</span>
+        <span class="s2">"list"</span> <span class="o">:</span> <span class="nx">List</span>
+    <span class="p">}</span>
+<span class="p">})</span>
+</pre></div>
+
+<h2>
+<a name="extending-kettle-structure" class="anchor" href="#extending-kettle-structure"><span class="octicon octicon-link"></span></a>Extending Kettle Structure</h2>
+
+<p>You can extend Kettle's structure to add your own options to all Kettle elements.
+To do so you can call the <code>add</code> method on the following objects:</p>
+
+<p><code>Kettle.elementLoader</code> To add an option for all Kettle Objects<br><code>Kettle.domValueLoader</code><br><code>Kettle.collectionViewLoader</code><br><code>Kettle.containerViewLoader</code><br><code>Kettles.templateViewLoader</code><br><code>Kettles.viewLoader</code>  </p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Kettles</span><span class="p">.</span><span class="nx">elementLoader</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">options</span><span class="p">.</span><span class="nx">className</span><span class="p">;</span>
+<span class="p">},</span>
+<span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">className</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">element</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="nx">className</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">View</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">className</span><span class="o">:</span> <span class="s2">"foo"</span><span class="p">,</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"foo"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">className</span> <span class="o">:</span> <span class="s2">"foo"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>The <code>add</code> method accepts two functions, the first function is the parser function, which will receive all the initial parameters
+of the element and return some value. The parser function will execute only upon the initial definition of the element.
+The second function is the builder function which will execute on every instantiation of the element and get the value 
+returned by the parser function as its first parameter.</p>
+
+<p>Note: Returning undefined from the parser function will cause the builder function not to execute.</p>
+
+<h2>
+<a name="extending-kettle-objects" class="anchor" href="#extending-kettle-objects"><span class="octicon octicon-link"></span></a>Extending Kettle Objects</h2>
+
+<p>When an <em>element</em> gets extended with the <code>extend</code> method, not only are you extending the prototype but also the
+behaviour of the parent, any events that were subscribed to on the parent will also be subscribed to on the child.</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="kd">var</span> <span class="nx">ParentView</span> <span class="o">=</span> <span class="nx">Kettle</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"foo"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"model.change:foo"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"parent :"</span> <span class="o">+</span> <span class="nx">v</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">ChildView</span> <span class="o">=</span> <span class="nx">ParentView</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">el</span> <span class="o">:</span> <span class="s1">'&lt;div&gt;&lt;div data-kettle="foo"&gt;&lt;/div&gt;&lt;/div&gt;'</span><span class="p">,</span>
+    <span class="nx">elements</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"foo"</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">"model.change:foo"</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"child :"</span> <span class="o">+</span> <span class="nx">v</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+
+<span class="nx">child</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ChildView</span><span class="p">(</span><span class="nx">model</span> <span class="o">:</span> <span class="k">new</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">({</span><span class="nx">foo</span> <span class="o">:</span> <span class="s1">'bar'</span><span class="p">}));</span> <span class="c1">//logs -&gt; 'parent: bar' , 'child: bar'</span>
+
+</pre></div>
+
+<h2>
+<a name="bbview" class="anchor" href="#bbview"><span class="octicon octicon-link"></span></a>BBView</h2>
+
+<p>For some views the structure that Kettle provides might not be a good fit, in those situations a <code>BBView</code> can be used. <code>BBView</code> is a plain
+<code>Backbone.View</code> which has been extended and adapted slightly so that it can be included as part of a <em>collection view</em> or a <em>container view</em>.
+Anyone familiar with <code>Backbone.View</code> should feel right at home with <code>Kettle.BBView</code> the only caveat is that if a model or collection need
+to be changed on a <code>Kettle.BBView</code> it must be done via the <code>set</code> method. eg.: <code>bbView.set('model',newmodel)</code>;</p>
+
+<h2>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h2>
+
+<h3>
+<a name="element" class="anchor" href="#element"><span class="octicon octicon-link"></span></a>Element</h3>
+
+<p>Element is the base object which all other objects inherit from.</p>
+
+<h4>
+<a name="properties-1" class="anchor" href="#properties-1"><span class="octicon octicon-link"></span></a>Properties</h4>
+
+<p><code>eventObjects</code> : A hash of all the event objects available to this view.<br><code>view</code> : the parent view element<br><code>el</code> : the DOM Node<br><code>$el</code> : the <code>jQuery</code> Object<br><code>model</code> : an alias for <code>eventObjects.model</code><br><code>collection</code> : an alias for <code>eventObjects.collection</code><br><code>state</code> :  an alias for <code>eventObjects.state</code>  </p>
+
+<h4>
+<a name="methods" class="anchor" href="#methods"><span class="octicon octicon-link"></span></a>Methods</h4>
+
+<p><code>bootstrapSubscriptions([\*arguments])</code> : runs the bootstrapping logic on provided subscriptions. If no arguments provided runs it on all.<br><code>hasSubscription</code> : returns a boolean if a subscription to a given <em>event object</em> exists.<br><code>get(name)</code> : retrieve a specific <em>event object</em> by name
+<code>remove()</code> : remove the element from the DOM and unsubscribe from all events (default options: {silent: false})<br><code>render(options)</code> : render the element (default options: {silent : false});<br><code>set(name, eventObject, options)</code> : sets a new event object for a given name, unsbscribing from all events on the old event object,<br>
+    and subsribing to the new one. Default options : {silent: false, render: true}<br><code>subscribe(name, event, fn)</code> : subscribes to a new event given the name of an event object, the event name and the function<br><code>unsbscribe(name, event, fn, attribute)</code> : Unsubscribe from an <em>event object</em> by name, you can also unsubscribe from specific events or functions<br>
+    by providing further paremeters.<br><code>unset()</code> : unset an <em>event object</em> by name  </p>
+
+<h3>
+<a name="view-1" class="anchor" href="#view-1"><span class="octicon octicon-link"></span></a>View</h3>
+
+<h4>
+<a name="properties-2" class="anchor" href="#properties-2"><span class="octicon octicon-link"></span></a>Properties</h4>
+
+<p><code>elements</code>: all the children elements that are added to the view  </p>
+
+<h4>
+<a name="methods-1" class="anchor" href="#methods-1"><span class="octicon octicon-link"></span></a>Methods</h4>
+
+<p><code>addElement(name, element)</code> : Add a new element to the view, the added element will inherit all of the views <em>event objects</em> (except for 'el')<br><code>remove()</code> : removes the element from the DOM and unsubscribes to all events, does the same on all child elements<br><code>render(options)</code> : renders the view and all child elements, triggers a <code>render</code> event on the view.<br><code>removeElement(element)</code> : removes an element from the view, element parameter can be either the name of the element or the element itself.<br><code>set(name, eventObject, options)</code> : sets a new <em>event object</em> for a given name on the view as well as all the child elements.  </p>
+
+<h3>
+<a name="domvalue" class="anchor" href="#domvalue"><span class="octicon octicon-link"></span></a>DomValue</h3>
+
+<p><em>dom value</em> is an element that holds a single value like a string. It is the Element used for two way binding.<br>
+When Constructing a view it is the Element that gets instantiated when a <code>bind</code> parameter is used in an <em>element</em> declaration, or when<br>
+either of <code>subview</code>, <code>subviews</code>, or <code>template</code> properties are omitted.  </p>
+
+<h4>
+<a name="methods-2" class="anchor" href="#methods-2"><span class="octicon octicon-link"></span></a>Methods</h4>
+
+<p><code>val()</code> returns the value of a DOM element<br><code>val(value)</code> : sets a value on the DOM element, the method for setting the value differs based on what type of element it is.
+    For example if it is an input element the <code>value</code> attribute will be set, if it's a div or a span the <code>textContent</code> will be set,
+    if it is a checkbox the <code>checked</code> property will be set ... etc.  </p>
+
+<h3>
+<a name="collectionview" class="anchor" href="#collectionview"><span class="octicon octicon-link"></span></a>CollectionView</h3>
+
+<p><em>collection view</em> manages multiple <em>sub views</em>, either automatically by watching a specific <code>Backbone.Collection</code> or manually.<br>
+When constructing a view it is the Element that gets instantiated when a <code>subviews</code> parameter is used in an element declaration.</p>
+
+<h4>
+<a name="properties-3" class="anchor" href="#properties-3"><span class="octicon octicon-link"></span></a>Properties</h4>
+
+<p><code>subviews</code> : An array of views added to the <em>collection view</em>  </p>
+
+<h4>
+<a name="methods-3" class="anchor" href="#methods-3"><span class="octicon octicon-link"></span></a>Methods</h4>
+
+<p><code>addView(view, index)</code> : At a view at a given index (or at the end if omitted). Will also insert the view within the DOM element of the 
+    <em>collection view</em>. If the view already exists in the collection, will remove it and re-add it to the correct index.<br><code>bootstrapViewSubscriptions([\*arguments])</code> : runs the bootstrapping logic on provided sub-view subscriptions. If no arguments provided runs it on all.<br><code>empty</code> : remove all views from the <em>collection view</em>, this will effectively destroy them and unbind all their events.<br><code>findWithEventObject(eventObject, name)</code> : find a view within a collection given a specific <em>event object</em>, if name is omitted it defaults to 'model'<br><code>findWithElement(el)</code> : find a view within a collection given a DOM element (can also pass a $ object, but only first element will be used);<br><code>hasViewSubscription</code> : returns a boolean if a subscription to a given <em>sub view</em> <em>event object</em> exists.<br><code>insert(view, index)</code> : inserts a particular view in a particular index of the DOM. Meant for over-ridding if you wish to include your own logic
+    as to how the views should be inserted into the collection (eg. in reverse order);<br><code>remove</code>: empty the <em>collection view</em> and remove it from the DOM, also unbinds all events.<br><code>removeView(view)</code> : remove a specific view from the <em>collection view</em>, this will not unbind any events on the view.<br><code>setEmptyView(view)</code> : set the view to display when the collection has no views.<br><code>setTarget(collection, model, create)</code> : set the collection to keep track of (by name). In order to automatically bind add, remove, reset and sort events.<br>
+    The model name will be the name of the eventObject that the subview will hold for each model of the collection and finally the create parameter is a
+    function that given a model will return a new view.<br><code>subscribeViews(name, event, fn)</code> : subscribes to a new event on a <em>sub view</em> given the name of an event object, the event name and the function<br><code>unsbscribeViews(name, event, fn, attribute)</code> : Unsubscribe from a <em>sub views</em> <em>event object</em> by name, you can also unsubscribe from specific events or functions
+    by providing further paremeters.  </p>
+
+<h3>
+<a name="containerview" class="anchor" href="#containerview"><span class="octicon octicon-link"></span></a>ContainerView</h3>
+
+<p><em>container view</em> is an element that contains within it exactly one view (or <em>dom value</em>, <em>collection view</em> etc). The view it contains can be swapped<br>
+for another at any time, with the option to have it share <em>event objects</em> with the parent <em>container view</em>. When constructing a view a <em>container view</em>
+will get instantiated when a <code>subview</code> parameter is used in an element declaration.</p>
+
+<h4>
+<a name="properties-4" class="anchor" href="#properties-4"><span class="octicon octicon-link"></span></a>Properties</h4>
+
+<p><code>subview</code> : the <em>sub view</em> that exists within the <em>container view</em>.  </p>
+
+<h4>
+<a name="methods-4" class="anchor" href="#methods-4"><span class="octicon octicon-link"></span></a>Methods</h4>
+
+<p><code>bootstrapViewSubscriptions([\*arguments])</code> : runs the bootstrapping logic on provided sub-view subscriptions. If no arguments provided runs it on all.<br><code>insert(view)</code> : Inserts a view within the body of the <code>contaienrView</code>. Meant for overriding if you wish to include your own logic as to how<br><code>empty</code> : Empties out the container view, destroying the <em>sub view</em> if there is one<br><code>hasViewSubscription</code> : returns a boolean if a subscription to a given <em>sub view</em> <em>event object</em> exists.<br>
+    the view should be inserted, by default its with <code>$el.append</code>.
+<code>remove</code> : remove the <em>container view</em> as well as the <em>sub view</em> it holds  from the DOM and unbinding all subscriptions.<br><code>setSubView(view, synced)</code> : sets a new <em>sub view</em>, removing the old one if it exists and thus unbinding all its subscriptions. If the synced option is set to
+    <code>true</code> than the subview will inherit all <em>event objects</em> of the <em>container view</em><br><code>subscribeViews(name, event, fn)</code> : subscribes to a new event on a <em>sub view</em> given the name of an event object, the event name and the function<br><code>unsbscribeViews(name, event, fn, attribute)</code> : Unsubscribe from a <em>sub view</em> <em>event object</em> by name, you can also unsubscribe from specific events or functions<br>
+    by providing further paremeters.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

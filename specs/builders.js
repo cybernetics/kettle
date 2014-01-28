@@ -64,6 +64,29 @@ describe("Element Builder: ", function() {
         expect(element.subscribe).toHaveBeenCalledWith('b.y','event2',fn2);
     });
 
+    it("applies the debounced model subscriptions to the element", function() {
+        jasmine.Clock.useMock();
+        var result = 0;
+        element.set('element', element);
+        var fn = function(num) {
+            expect(this).toBe(element);
+            result+= num
+        };
+        builder({bindingsDebounced: [{ bindings: [{ name: 'element', event: 'test'}] , fn: [fn]} ] });
+        element.trigger('test',1).trigger('test',2).trigger('test',3);
+        expect(result).toBe(0);
+        jasmine.Clock.tick(1);
+        expect(result).toBe(3);
+        element.trigger('test',4).trigger('test',5).trigger('test',6);
+        expect(result).toBe(3);
+        jasmine.Clock.tick(1);
+        expect(result).toBe(9);
+        element.trigger('test',7).trigger('test',8).trigger('test',9);
+        expect(result).toBe(9);
+        jasmine.Clock.tick(1);
+        expect(result).toBe(18);
+    });
+
     it("replaces the placeholder of an attribute with the elements name", function() {
         element.name = 'foo';
         spyOn(element,'subscribe');
@@ -194,6 +217,23 @@ describe("CollectionView Builder: ", function() {
 
     });
 
+    it("applies the debounced view events", function() {
+        jasmine.Clock.useMock();
+        var result = 0;
+        var element = new Kettle.Element({el: $elem.clone()});
+        element.set('element', element);
+        collectionView.addView(element);
+        var fn = function(num) {
+            expect(this).toBe(collectionView);
+            result+= num
+        };
+        builder({eventsviewsDebounced: [{ bindings: [{ name: 'element', event: 'test'}] , fn: [fn]} ] });
+        element.trigger('test',1).trigger('test',2).trigger('test',3);
+        expect(result).toBe(0);
+        jasmine.Clock.tick(1);
+        expect(result).toBe(3);
+    });
+
     it("creates a view given a constructor", function() {
         var View = Kettle.View.extend({el : "<div></div>"});
         var model = new Backbone.Model();
@@ -237,5 +277,22 @@ describe("ContainerView Builder: ", function() {
         ]});
 
         expect(containerView.subscribeViews).toHaveBeenCalledWith('view','a:b', fn);
+    });
+
+    it("applies the debounced view events", function() {
+        jasmine.Clock.useMock();
+        var result = 0;
+        var element = new Kettle.Element({el: $elem.clone()});
+        element.set('element', element);
+        containerView.setSubView(element);
+        var fn = function(num) {
+            expect(this).toBe(containerView);
+            result+= num
+        };
+        builder({eventsviewsDebounced: [{ bindings: [{ name: 'element', event: 'test'}] , fn: [fn]} ] });
+        element.trigger('test',1).trigger('test',2).trigger('test',3);
+        expect(result).toBe(0);
+        jasmine.Clock.tick(1);
+        expect(result).toBe(3);
     });
 });

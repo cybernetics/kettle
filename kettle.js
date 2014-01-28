@@ -47,6 +47,24 @@
         return obj;
     }
 
+    function debounce(fn) {
+        var args, context, ran = false;
+
+        return function() {
+            args = arguments;
+            context = this;
+
+            if (!ran) {
+                ran = true;
+                setTimeout(function(){
+                    fn.apply(context, args);
+                    context = args = null;
+                    ran = false;
+                },0);
+            }
+        };
+    }
+
 
     if (typeof exports !== 'undefined') {
         Kettle = exports;
@@ -81,13 +99,11 @@
         },
 
         unbindEvent : function(obj, context, event, fn , attribute) {
-
             if (obj instanceof Backbone.$) {
                 fn ? obj.off(event, this._unproxy(fn, context)) : obj.off(event);
             } else {
                 obj.off(attribute ? event + ":" + attribute : event, fn, context);
             }
-
         },
         //used to bootstrap certain events depending on what the object is.
         //the functions called as a result will behave as though they were
@@ -1206,19 +1222,37 @@
             return els;
         }
 
-        function subscribeEvents (element, bindings, fn) {
+        function subscribeEvent(element, eventObjectName, event, attribute, fn, subFn) {
+            if (attribute === PLACEHOLDER) attribute = element.name;
+            if (eventObjectName === 'el') {
+                addDefferedEvent(element, subFn, eventObjectName, event, fn);
+            } else {
+                element[subFn](eventObjectName, attribute ? event + ':' + attribute : event, fn);
+            }
+        }
+
+        function subscribeEvents (element, bindings, subFn) {
             var i, l, binding, attribute, event;
 
            for (i = 0, l = bindings.length; i < l; i++) {
                 binding = bindings[i];
-                attribute = binding.attribute;
-                if (attribute === PLACEHOLDER) attribute = element.name;
-                if (binding.name === 'el') {
-                    addDefferedEvent(element, fn, binding.name, binding.event, binding.fn);
-                } else {
-                    event = attribute ? binding.event + ':' + attribute : binding.event;
-                    element[fn](binding.name, event, binding.fn);
+                subscribeEvent(element, binding.name, binding.event, binding.attribute, binding.fn, subFn);
+            }
+        }
+
+        function subscribeDebouncedEvents (element, bindings, subFn) {
+            var i, l, j, ll, k, lll, debounced, binding, attribute, event, fns;
+
+           for (i = 0, l = bindings.length; i < l; i++) {
+                debounced = bindings[i];
+                fns = _.map(debounced.fn, debounce);
+                for (j=0, ll = debounced.bindings.length; j < ll; j++) {
+                    binding = debounced.bindings[j];
+                    for (k = 0, lll = fns.length; k < lll; k++) {
+                        subscribeEvent(element, binding.name, binding.event, binding.attribute, fns[k], subFn);
+                    }
                 }
+
             }
         }
 
@@ -1291,6 +1325,7 @@
             element : function(element, buildParams) {
                 if (buildParams.unknown) _.extend(element, buildParams.unknown);
                 if (buildParams.bindings) subscribeEvents(element, buildParams.bindings, 'subscribe');
+                if (buildParams.bindingsDebounced) subscribeDebouncedEvents(element, buildParams.bindingsDebounced, 'subscribe');
                 if (buildParams.setup) {
                     for (var setups = buildParams.setup, i=0, l=setups.length; i<l; i++) setups[i].call(element);
                 }
@@ -1308,6 +1343,7 @@
                     synced = subview.synced;
 
                 if (buildParams.eventsviews) subscribeEvents(containerView, buildParams.eventsviews, 'subscribeViews');
+                if (buildParams.eventsviewsDebounced) subscribeDebouncedEvents(containerView, buildParams.eventsviewsDebounced, 'subscribeViews');
                 if (View) containerView.setSubView(new View({render : false}), synced);
                 else if (set) containerView.setSubView( _.isFunction(set) ? set.call(containerView) : set, synced);
                 Kettle.elementLoader.build(containerView, buildParams);
@@ -1331,6 +1367,7 @@
                 }
 
                 if (buildParams.eventsviews) subscribeEvents(collectionView, buildParams.eventsviews, 'subscribeViews');
+                if (buildParams.eventsviewsDebounced) subscribeDebouncedEvents(collectionView, buildParams.eventsviewsDebounced, 'subscribeViews');
                 if (empty) collectionView.setEmptyView(_.isFunction(empty) ? empty.call(collectionView) : empty );
                 Kettle.elementLoader.build(collectionView, buildParams);
             },
@@ -1348,8 +1385,9 @@
     //It can be thought of a as a compile step that happens once during the definition of an Element.
     var parsers = (function() {
 
-        var RPROP_DIVIDER = /\s+(?![^\[]*\])/,
+        var RPROP_DIVIDER = /\s+(?![^\[]*\]|[^\{]*\})/,
             RBRACKET_NOTATION = /(.*?)\[(.*?)\]/,
+            RCURLY_BRACKET_NOTATION = /(.*?)\{(.*?)\}/,
             DOT_NOTATION = '.',
             EVENTS_NOTATION = '*',
             PREFIXES = ['*'],
@@ -1367,7 +1405,7 @@
         //only the events with a given prefix (everything before the first dot)
         //and strip it out in the return.
         function getEvents(obj, prefix) {
-            var prop, props, sprop, i , l, events,
+            var prop, props, sprop, i , l, events, prefixChars,
                 rtn = {};
 
             events =  obj;
@@ -1377,7 +1415,9 @@
                 for (i = 0, l = props.length; i < l; i++) {
                     sprop = props[i];
                     if (sprop.indexOf(DOT_NOTATION) >= 0) {
-                        if (!prefix || sprop.substring(0, prefix.length) === prefix) {
+                        prefixChars = sprop.substring(0, 1);
+
+                        if ((!prefix && !_.contains(PREFIXES, prefixChars)) || prefixChars === prefix) {
                             prefix && (sprop = sprop.replace(prefix, ""));
                             rtn[sprop] = combineIntoArray(events[prop], rtn[sprop]);
                         }
@@ -1387,6 +1427,40 @@
 
             var bracket = bracketToDot(obj);
             if (!_.isEmpty(bracket)) extendConcat(rtn, getEvents(bracket, prefix));
+
+            return rtn;
+        }
+
+        function getDebouncedEvents(obj, prefix) {
+            var prop, props,eventNames, event, key, debounce, i, l, exec, j, ll,
+                prefixChars, rtn = [];
+
+            for (prop in obj) {
+                props = prop.split(RPROP_DIVIDER);
+                for (i = 0, l = props.length; i<l; i++) {
+                    debounce = {};
+                    exec = RCURLY_BRACKET_NOTATION.exec(props[i]);
+                    if (exec && exec[2]) {
+                        event = exec[1];
+                        eventNames = exec[2].split(RPROP_DIVIDER);
+                        for (j = 0, ll = eventNames.length; j<ll; j++) {
+                            key = event + DOT_NOTATION + eventNames[j];
+                            prefixChars = key.substring(0, 1);
+                            if ((!prefix && !_.contains(PREFIXES, prefixChars)) || prefixChars === prefix) {
+                                if (!debounce.bindings) debounce.bindings = [];
+                                prefix && (key = key.replace(prefix, ""));
+                                debounce.bindings.push(key);
+                            }
+                        }
+                    }
+
+                    if (!_.isEmpty(debounce)) {
+                        debounce.fn = _.isArray(obj[prop]) ? obj[prop] : [obj[prop]];
+                        rtn.push(debounce);
+                    }
+                }
+
+            }
 
             return rtn;
         }
@@ -1471,7 +1545,8 @@
                 extractUnknown = function(chunk) {
                     var f = chunk[0];
 
-                    if ((chunk.indexOf(DOT_NOTATION) === -1) && !RBRACKET_NOTATION.test(chunk) && !_.contains(KNOWN_PARAMETERS, chunk)) {
+                    if ((chunk.indexOf(DOT_NOTATION) === -1) && !RBRACKET_NOTATION.test(chunk) &&
+                        !RCURLY_BRACKET_NOTATION.test(chunk) && !_.contains(KNOWN_PARAMETERS, chunk)) {
                         extentions[chunk] = params[prop];
                     }
                 };
@@ -1496,28 +1571,45 @@
         }
 
         function extractModelEvents(params, prefix) {
-            var dotIndex, parts, attIndex, event, eventName, attribute, bindings = [];
+            var bindings = [];
 
             _.each(getEvents(params, prefix), function(eventFns, eventString){
-                dotIndex = eventString.indexOf(DOT_NOTATION);
-                event = eventString.substring(0, dotIndex);
-                if (!_.contains(PREFIXES, event.substring(0,1))) {
-                    parts = eventString.substring(dotIndex + 1);
-                    parts = parts.split(":");
-                    eventName = parts[0];
-                    attribute = parts[1];
+                var binding = getBindingObject(eventString);
 
-                    _.isArray(eventFns) ?
-                        _.each(eventFns, function(fn) {
-                            bindings.push({name: event, event: eventName, fn: parseFn(fn), attribute : attribute});
-                        })
-                        :
-                        bindings.push({name: event, event: eventName, fn: parseFn(eventFns), attribute : attribute});
-                }
-
+                eventFns = _.isArray(eventFns) ? eventFns : [eventFns];
+                _.each(eventFns, function(fn) {
+                    bindings.push(_.extend({fn: parseFn(fn)}, binding));
+                });
             });
 
             return bindings;
+        }
+
+        function extractModelDebouncedEvents(params, prefix) {
+            var bindings = [];
+
+            _.each(getDebouncedEvents(params, prefix), function(data) {
+                var debounce = {};
+                debounce.bindings = _.map(data.bindings, getBindingObject);
+                debounce.fn = _.map(data.fn, parseFn);
+                bindings.push(debounce);
+            });
+
+            return bindings;
+        }
+
+        function getBindingObject(eventString) {
+            var binding, dotIndex, parts, attIndex, event, eventName, attribute;
+            dotIndex = eventString.indexOf(DOT_NOTATION);
+            event = eventString.substring(0, dotIndex);
+            parts = eventString.substring(dotIndex + 1);
+            parts = parts.split(":");
+            eventName = parts[0];
+            attribute = parts[1];
+
+            binding = {name: event, event: eventName, attribute : attribute};
+
+            return binding;
         }
 
         return {
@@ -1616,8 +1708,14 @@
                 params.bindings = extractModelEvents(apiParams);
                 if (params.bindings.length === 0) delete params.bindings;
 
+                params.bindingsDebounced = extractModelDebouncedEvents(apiParams);
+                if (params.bindingsDebounced.length === 0) delete params.bindingsDebounced;
+
                 params.eventsviews = extractModelEvents(apiParams, EVENTS_NOTATION);
                 if (params.eventsviews.length === 0) delete params.eventsviews;
+
+                params.eventsviewsDebounced = extractModelDebouncedEvents(apiParams, EVENTS_NOTATION);
+                if (params.eventsviewsDebounced.length === 0) delete params.eventsviewsDebounced;
 
 
                 if (apiParams.setup) params.setup = _.isArray(apiParams.setup) ? apiParams.setup : [apiParams.setup];

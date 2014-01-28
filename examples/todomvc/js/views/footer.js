@@ -13,13 +13,13 @@ var app = app || {};
 				serialize : function() {
 					return {remaining : this.collection.remaining().length};
 				},
-				"collection[add remove change:completed reset]" : function() {
+				"collection{add remove change:completed reset}" : function() {
 					this.render();
 				}
 			},
 
 			"completed" : {
-				"collection[add remove change:completed reset]" : function() {
+				"collection{add remove change:completed reset}" : function() {
 					this.val(this.collection.completed().length);
 				}
 			},
@@ -33,7 +33,7 @@ var app = app || {};
 			},
 
 			"clear_completed" : {
-				"collection[add remove change:completed reset]" : function() {
+				"collection{add remove change:completed reset}" : function() {
 					this.$el.toggle(!!this.collection.completed().length);
 				},
 				 "el.click" : function(e) {

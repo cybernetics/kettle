@@ -230,13 +230,21 @@ When defining a *view*, events can be written in either dot or bracket notation.
 Events can be bound to a *view* or its *elements* using the dot notation. Where the name before the dot is the name of the
 *event object*. The word after the dot is the name of the event, For example: `model.change` or `model.change:attribute`
 
-#### Bracket Notation
+#### Square Bracket Notation
 
 `eventObject[eventName1 eventName2]`
 
 Events can also be bound using the bracket notation. This allows for easily binding multiple events on the same *event object*.
 The word before the brackets is the name of the *event object* while the words in the brackets, which are separate by a space
 are the event names. For example: 'collection[add remove reset]'
+
+#### Curly Bracket Notation
+
+`eventObject{eventName1 eventName2}`
+
+Curly brackets work much the same way as square brackets with one important distinction; all events bound with the curly bracket 
+notation will be called only one time once the call stack has cleared. (debounced). It can be useful for example, when you need
+to calculate some aggregated data that needs to be recalculated when a new model is added/removed to/from a collection.
 
 ### Properties
 
@@ -246,6 +254,7 @@ Below is a list of valid properties that can be defined on a *view*/*elements*
 
 dot-notation events: events bound to the view/element in the dot-notation.  
 bracket-notation events: events bound to the view/element in the bracket-notation  
+curly bracket-notation events: events bound to the view/element in the curly bracket notation (debounced)  
 `group`: a group or array of groups that the view/element inherits its behavior from  
 `setup`: a method (or array of methods) that will be called after this element/view has been instantiated, typically to modify `el`  
 

@@ -187,6 +187,54 @@ describe("Element parsers: ", function() {
             });
     });
 
+    it("binds debounced model events", function() {
+        expect(parse({ "x{a b c} y{a b}" : [fn,fn] }))
+            .toEqual({
+                bindingsDebounced:[
+                    {
+                        bindings:[
+                            {name:'x',event:'a',attribute:undefined},
+                            {name:'x',event:'b',attribute:undefined},
+                            {name:'x',event:'c',attribute:undefined}
+                        ],
+                        fn:[fn, fn]
+                    },
+                    {
+                        bindings:[
+                            {name:'y',event:'a',attribute:undefined},
+                            {name:'y',event:'b',attribute:undefined},
+                        ],
+                        fn:[fn, fn]
+                    },
+                ]
+            });
+    });
+
+    it("binds debounced subview  events", function() {
+        expect(parse({ "*x{a b c} y{a b}" : [fn,fn] }))
+            .toEqual({
+                bindingsDebounced:[
+                    {
+                        bindings:[
+                            {name:'y',event:'a',attribute:undefined},
+                            {name:'y',event:'b',attribute:undefined},
+                        ],
+                        fn:[fn, fn]
+                    },
+                ],
+                eventsviewsDebounced: [
+                    {
+                        bindings:[
+                            {name:'x',event:'a',attribute:undefined},
+                            {name:'x',event:'b',attribute:undefined},
+                            {name:'x',event:'c',attribute:undefined}
+                        ],
+                        fn:[fn, fn]
+                    }
+                ]
+            });
+    });
+
     it("bind model events with a string", function() {
         var binding = parse({"x.a" : 'method'}).bindings[0];
         expect(typeof binding.fn=== 'function').toBe(true);

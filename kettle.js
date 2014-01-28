@@ -939,7 +939,7 @@
             this.empty();
             CollectionView.__super__.remove.call(this);
             if (this.emptyView) {
-                this.emptyview.remove();
+                this.emptyView.remove();
             }
 
             return this;

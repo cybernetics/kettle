@@ -236,7 +236,9 @@
 
         //add an event object to listen to, all existing subscriptions will register with the added object
         add : function(name, eventObject) {
-            var context = this.context, eventObjects;
+            var eventObjects, events, prop, evData, i, l,
+                context = this.context,
+                subs = this.subscriptions[name];
 
             if (!this.eventObjects[name]) this.eventObjects[name] = [];
 
@@ -244,11 +246,13 @@
 
             eventObjects.push(eventObject);
 
-            _.each(this.subscriptions[name], function (events, event){
-                _.each(events, function (evData) {
-                    EventInterface.bindEvent(eventObject, context, event, evData.fn, evData.attribute);
-                });
-            });
+            for (prop in subs) {
+                events = subs[prop];
+                for (i = 0, l = events.length; i < l; i++) {
+                    evData = events[i];
+                    EventInterface.bindEvent(eventObject, context, prop, evData.fn, evData.attribute);
+                }
+            }
 
             return this;
         },
@@ -256,17 +260,20 @@
         //bootstraps all added eventObjects with the subscribed events, arguments can be provided to pick
         //specific eventObjects (by name)
         bootstrap: function () {
-
-            var eventObjects = this.eventObjects,
+            var i, l, j, ll, events, prop, eventObjects,
                 context = this.context,
                 subscriptions = arguments.length === 0 ? this.subscriptions: _.pick(this.subscriptions, _.toArray(arguments));
 
-            _.each(subscriptions, function(events, name) {
-                _.each(eventObjects[name], function(eventObject) {
-                    EventInterface.bootstrap(eventObject, context, events);
-                });
-            });
+            for (prop in subscriptions) {
+                events = subscriptions[prop ];
+                eventObjects = this.eventObjects[prop ];
 
+                if (eventObjects) {
+                    for (i = 0, l = eventObjects.length; i < l; i++) {
+                        EventInterface.bootstrap(eventObjects[i], context, events);
+                    }
+                }
+            }
 
             return this;
         },
@@ -303,7 +310,8 @@
 
         //subscribe to a new event , registering all added event objects to it*/
         subscribe: function (name, event, fn) {
-            var attribute, events,
+            var attribute, events, i, l,
+                eventObjects = this.eventObjects[name],
                 context = this.context,
                 parts = event.split(':');
 
@@ -325,9 +333,11 @@
                 attribute : attribute
             });
 
-            _.each(this.eventObjects[name], function(obj) {
-                EventInterface.bindEvent(obj, context, event, fn, attribute);
-            });
+            if (eventObjects) {
+                for (i = 0, l = eventObjects.length; i < l; i++) {
+                    EventInterface.bindEvent(eventObjects[i], context, event, fn, attribute);
+                }
+            }
 
             return this;
         },
@@ -520,9 +530,9 @@
 
             }
 
-            this.eventObjects = {el: this.$el, view: this};
+            this.eventObjects = {el: this.$el};
 
-            this._subs = new EventListeners(this).add('el', this.$el).add('view', this);
+            this._subs = new EventListeners(this).add('el', this.$el);
 
     };
 
@@ -642,14 +652,14 @@
     //view can communicate with each other. Also provides some built-in events, they include
     // 'load', 'change', 'remove'
     var View = Element.extend({
-        constructor : function(el) {
+        constructor: function(el) {
             View.__super__.constructor.call(this, el);
             this.elements = {};
         },
 
         //Adds a new elements to the view, requires a name for which the element can be identified as
         //will also add all the eventObjects that the view possess into the added element.
-        addElement : function(name, element) {
+        addElement: function(name, element) {
             if (!_.isString(name) || this.elements[name]) throwError("name invalid or taken");
             if (element.view) throwError("Element already owned by a view");
 
@@ -683,11 +693,16 @@
             return this;
         },
 
-        render : function(options) {
-             var silent = options ? options.silent : false;
+        render: function(options) {
+             var prop,
+                silent = options ? options.silent : false,
+                elements = this.elements;
 
             this.bootstrap();
-            _.invoke(this.elements, 'render', {silent: true});
+
+            for (prop in elements) {
+                elements[prop].render({silent: true});
+            }
 
             if (!silent) {
                 this.trigger('render', this);
@@ -815,13 +830,18 @@
         _set: function() {},
 
         _findFn: function() {
-            var tag = this.el.tagName,
-                type = this.el.getAttribute('type');
+            var type, tag = this.el.tagName;
 
-            if ((tag === 'INPUT') && (type === 'radio' || type === 'checkbox')) {
-                this._get = this._checkboxGet;
-                this._set = this._checkboxSet;
-            } else if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+            if (tag === 'INPUT') {
+                type = this.el.getAttribute('type');
+                if ((type === 'radio' || type === 'checkbox')) {
+                    this._get = this._checkboxGet;
+                    this._set = this._checkboxSet;
+                } else {
+                    this._get = this._valGet;
+                    this._set = this._valSet;
+                }
+            } else if (tag === 'TEXTAREA' || tag === 'SELECT') {
                 this._get = this._valGet;
                 this._set = this._valSet;
             } else if (tag === 'IMG') {
@@ -850,32 +870,26 @@
         //if omitted the view gets appended to the end.
         //will also insert the view into the collections DOM element
         //into the position specified by the index
-        //If a view is already a part of the collection it will be removed
-        //and re-added with its new position.
         addView: function (view, index) {
             var subviews = this.subviews;
 
-            if (!_.contains(subviews,view)) {
-                (index != null) || (index = subviews.length);
-                subviews.splice(index, 0, view);
+            (index != null) || (index = subviews.length);
+            subviews.splice(index, 0, view);
 
-                //bind to the remove method, so that we can remove this view
-                //from our collection if it ever gets removed.
-                view.on('remove', this.removeView, this);
+            //bind to the remove method, so that we can remove this view
+            //from our collection if it ever gets removed.
+            view.on('remove', this.removeView, this);
 
-                this._addViewEventObject(view);
+            this._addViewEventObject(view);
 
-                this.insert(view, index);
+            this.insert(view, index);
 
-                if (this.emptyView) {
-                    this.emptyView.$el.detach();
-                }
-
-                this.bootstrapViewSubscriptions(view);
-
-            } else {
-                this.removeView(view).addView(view, index);
+            if (this.emptyView) {
+                this.emptyView.$el.detach();
             }
+
+            this.bootstrapViewSubscriptions(view);
+
 
             return this;
         },
@@ -999,7 +1013,7 @@
             this.addView(view, index);
         },
         _onReset : function() {
-            var i, l,
+            var i, l, view,
                 collection = this.eventObjects[this._target.collection],
                 models = collection.models,
                 options = {};
@@ -1007,8 +1021,8 @@
             this.empty();
 
             for (i=0, l=models.length; i < l; i++) {
-                options.at = i;
-                this._onAdd(models[i], options);
+                view = this._target.createView(models[i]);
+                this.addView(view);
             }
         },
         _onRemove : function(model) {
@@ -1290,12 +1304,13 @@
 
        return {
             view : function (view, buildParams) {
-                var attr = buildParams.attr,
+                var el, element, buildData, name,
+                    attr = buildParams.attr,
                     els = getElsWithAttr(view.$el, attr),
                     defaults = buildParams.defaults;
 
-                _.each(buildParams.elements, function(buildData, name) {
-                   var el, element;
+                for (name in buildParams.elements) {
+                    buildData = buildParams.elements[name];
 
                    el = els[name];
 
@@ -1307,7 +1322,7 @@
                         if (buildData.loader) buildData.loader.build(element, buildData.data);
                    }
 
-                });
+                }
 
                 if (defaults) {
                     _.each(els, function(el, name){
@@ -1909,7 +1924,7 @@
                     }
 
                     Constructor.call(this, { el : el} );
-
+                    this.set('view', this);
 
                     loader.build(this, this._parsed);
 

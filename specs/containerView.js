@@ -6,6 +6,7 @@ describe("ContainerView: ", function () {
         $templatechild = $("<div></div>");
         containerView = new Kettle.ContainerView({el: $template});
         child = new Kettle.View({el : $templatechild});
+        child.set('view', child);
         containerView.setSubView(child);
     });
 
@@ -51,6 +52,7 @@ describe("ContainerView: ", function () {
 
         it("unsubscribes from the old view and moves those subscriptions to the new view", function() {
             var newchild = new Kettle.View({el : $templatechild});
+            newchild.set('view', newchild);
             var ran = false;
             containerView.subscribeViews('view', 'test', function() {
                 ran = true;

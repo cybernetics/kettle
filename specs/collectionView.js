@@ -4,7 +4,9 @@ describe("CollectionView: ", function() {
 
   beforeEach(function() {
     subView1 = new Kettle.View({ el : $('<div id="1"></div>')});
+    subView1.set('view', subView1);
     subView2 = new Kettle.View({ el : $('<div id="2"></div>')});
+    subView2.set('view', subView2);
     collectionView = new Kettle.CollectionView({ el : $('<div></div>')});
     model = new Backbone.Model();
   });
@@ -29,17 +31,6 @@ describe("CollectionView: ", function() {
       expect(collectionView.$el.children().last().attr('id')).toBe('1');
       collectionView.addView(subView2);
       expect(collectionView.$el.children().last().attr('id')).toBe('2');
-    });
-
-    it("place the view in a new position if adding a view that already exists in the collection", function() {
-      collectionView.addView(subView1);
-      collectionView.addView(subView2);
-      collectionView.addView(subView1);
-      expect(collectionView.subviews[1]).toBe(subView1);
-      expect(collectionView.$el.children().last().attr('id')).toBe('1');
-      collectionView.addView(subView1,0);
-      expect(collectionView.subviews[0]).toBe(subView1);
-      expect(collectionView.$el.children().first().attr('id')).toBe('1');
     });
 
 

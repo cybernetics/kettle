@@ -2,19 +2,19 @@
 var app = app || {};
 
 (function () {
-	'use strict';
+    'use strict';
 
-	// Todo Router
-	// ----------
-	var Workspace = Backbone.Router.extend({
-		routes: {
-			'*filter': 'setFilter'
-		},
+    // Todo Router
+    // ----------
+    var Workspace = Backbone.Router.extend({
+        routes: {
+            '*filter': 'setFilter'
+        },
 
-		setFilter: function (param) {
-			app.AppModel.set('filter', param || '');
-		}
-	});
+        setFilter: function (param) {
+            app.AppModel.set('filter', param || '');
+        }
+    });
 
-	app.TodoRouter = new Workspace();
+    app.TodoRouter = new Workspace();
 })();

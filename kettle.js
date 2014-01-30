@@ -1203,8 +1203,8 @@
     //used for things like setting up 2-way binding, subscribe elements to events, etc.
     var builders = (function() {
 
-        var PLACEHOLDER = '{name}';
-        var deffered = null;
+        var PLACEHOLDER = '{name}',
+            deffered = null;
 
         //Dom events are deffered as to not block the initial render
         //binding a large amount of dom events (typically during 2-way binding)
@@ -1272,14 +1272,8 @@
 
         //simple method that takes care of basic 2-way binding
         function bindDomValue(domValue, binding) {
-            var time,
-                name,
-                attribute,
-                bindingSplit,
-                domEvent,
-                fromDOM,
-                fromModel,
-                type = domValue.el.tagName;
+            var time, name, attribute, bindingSplit, domEvent, fromDOM, fromModel, type,
+                tag = domValue.el.tagName;
 
             name = binding.eventObject;
             attribute = binding.attribute;
@@ -1293,11 +1287,21 @@
                 if (!options || options.origin !== this.el) this.val(v == null ? '' : v);
             };
 
-            if (attribute === PLACEHOLDER) attribute = domValue.name;
+            if (attribute ==  null) attribute = domValue.name;
 
             domValue.subscribe(name, 'change:'+attribute, fromModel);
 
-            if (type === 'INPUT' || type === 'TEXTAREA' || type === 'SELECT') {
+            if (domEvent == null) {
+                if (tag === 'SELECT') domEvent = 'change';
+                else if (tag === 'TEXTAREA') domEvent = 'change keyup';
+                else if (tag === 'INPUT') {
+                    type = domValue.el.getAttribute('type');
+                    if (!type || type === 'text') domEvent = 'change keyup';
+                    else domEvent = 'change';
+                }
+            }
+
+            if (domEvent != null) {
                 addDefferedEvent(domValue, 'subscribe', 'el', domEvent, fromDOM);
             }
         }
@@ -1742,7 +1746,7 @@
 
                 if (apiParams.bind) {
                     var parts,
-                        defaultBinding = {eventObject: 'model', attribute: '{name}', domEvent: 'change'},
+                        defaultBinding = {eventObject: 'model'},
                         bind = apiParams.bind;
 
                     if (_.isString(bind)) {

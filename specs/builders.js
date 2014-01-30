@@ -154,6 +154,31 @@ describe("DomValue Builder: ", function() {
         expect(model.get('foo')).toBe('foo');
     });
 
+    it("picks default bindings depending on element tag", function() {
+        var model = new Backbone.Model();
+        domValue.set('model', model);
+
+        builder({bind : {
+            eventObject: 'model',
+            attribute: 'foo',
+        }});
+
+        model.set('foo', 'bar');
+
+        expect(domValue.$el.val()).toBe('bar');
+
+        model.set('foo', undefined);
+        expect(domValue.$el.val()).toBe('');
+
+        model.set('foo', null);
+        expect(domValue.$el.val()).toBe('');
+        jasmine.Clock.tick(5);
+        domValue.$el.val('foo').trigger('keyup');
+        expect(model.get('foo')).toBe('foo');
+        domValue.$el.val('foo2').trigger('change');
+        expect(model.get('foo')).toBe('foo2');
+    });
+
     it("replace the placeholder with domValues name", function() {
         var model = new Backbone.Model();
         domValue.set('model', model);
@@ -161,7 +186,6 @@ describe("DomValue Builder: ", function() {
         domValue.name = 'foo';
         builder({bind : {
             eventObject: 'model',
-            attribute: '{name}',
             domEvent: 'change'
         }});
 

@@ -312,43 +312,37 @@ describe("Element parsers: ", function() {
     it("sets the default 2-way binding values", function() {
         expect(parse({bind: true}))
             .toEqual({bind: {
-                eventObject: 'model',
-                attribute: '{name}',
-                domEvent: 'change'
+                eventObject: 'model'
             }});
     });
 
     it("sets the 2-way binding using a string", function() {
         expect(parse({bind: "foo"}))
-            .toEqual({ bind : { eventObject : 'model', attribute : 'foo', domEvent : 'change' } });
+            .toEqual({ bind : { eventObject : 'model', attribute : 'foo' } });
     });
 
     it("sets the 2-way binding using string with dot notation", function() {
         expect(parse({bind: "bar.foo"}))
-            .toEqual({ bind : { eventObject : 'bar', attribute : 'foo', domEvent : 'change' } });
+            .toEqual({ bind : { eventObject : 'bar', attribute : 'foo' } });
     });
 
     it("allows of overriding indivual 2-way binding values", function() {
         expect(parse({bind: {domEvent: 'keyup'}}))
             .toEqual({bind: {
                 eventObject: 'model',
-                attribute: '{name}',
                 domEvent: 'keyup'
             }});
 
 
         expect(parse({bind: {eventObject: 'foo'}}))
             .toEqual({bind: {
-                eventObject: 'foo',
-                attribute: '{name}',
-                domEvent: 'change'
+                eventObject: 'foo'
             }});
 
         expect(parse({bind: {attribute: 'bar'}}))
             .toEqual({bind: {
                 eventObject: 'model',
-                attribute: 'bar',
-                domEvent: 'change'
+                attribute: 'bar'
             }});
     });
 

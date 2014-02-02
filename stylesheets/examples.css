@@ -1,0 +1,61 @@
+#todos {
+    float: left;
+    width: 283px;
+    margin-top: 43px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.23);
+    padding: 5px;
+    background: rgba(7, 40, 77, 0.23);
+}
+.done {
+    text-decoration: line-through;
+}
+
+.close {
+  color: white !important;
+
+}
+
+#add-todo, #remove-completed {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+#remove-completed {
+
+}
+
+.todo-list {
+   padding: 16px 0 0 0;
+   min-height: 155px;
+ }
+
+.example {
+    overflow: hidden;
+    margin-top: 40px;
+}
+
+#todo-code {
+    float: left;
+    width: 645px;
+    font-size: 80%;
+}
+
+#choose-lang a {
+    font-weight:bold;
+    font-size: 110%;
+
+}
+
+.lang-js, .language-javascript {
+    display: none;
+}
+
+#choose-lang .selected {
+    cursor: default;
+    color: inherit;
+    font-size: 130%;
+    text-decoration: none;
+}

@@ -244,8 +244,7 @@ mark {
 /*
  * Addresses margins set differently in IE6/7
  */
-p,
-pre {
+p {
   margin: 1em 0;
 }
 
@@ -551,7 +550,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: normal;
 }
 
-p, ul, ol, table, pre, dl {
+p, ul, ol, table, dl {
   margin: 0 0 20px;
 }
 
@@ -564,8 +563,9 @@ h1 {
 }
 
 h2 {
-  font-size: 24px;
-  margin-top: 85px;
+  font-size: 40px;
+  margin-top: 50px;
+  margin-bottom: 15px;
 }
 
 h4, h5, h6 {
@@ -606,10 +606,9 @@ strong {
 }
 
 .wrapper {
-  max-width: 750px;
+  max-width: 950px;
   margin: 0 auto;
   position: relative;
-  padding: 0 20px;
 }
 
 section img {
@@ -635,30 +634,6 @@ code {
   -ms-border-radius: 2px;
   -khtml-border-radius: 2px;
   border-radius: 2px;
-}
-
-pre {
-  padding: 8px 15px;
-  background: #191919;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  -o-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -khtml-border-radius: 2px;
-  border-radius: 2px;
-  border: 1px solid #121212;
-  -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  -o-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  overflow: auto;
-  overflow-y: hidden;
-}
-pre code {
-  color: #efefef;
-  text-shadow: 0px 1px 0px #000;
-  margin: 0;
-  padding: 0;
 }
 
 table {
@@ -695,6 +670,20 @@ dt {
   font-weight: normal;
 }
 
+#gh-buttons {
+  width: 100%;
+  margin-right: 20px;
+  text-align: right;
+  top: 25px;
+  margin-top: 25px;
+  z-index: 10;
+}
+
+#features li{
+    font-weight: bold;
+    line-height: 2;
+}
+
 #header {
   z-index: 100;
   left: 0;
@@ -710,7 +699,7 @@ dt {
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.25);
 }
 #header nav {
-  max-width: 750px;
+  max-width: 950px;
   margin: 0 auto;
   padding: 0 10px;
   background: blue;
@@ -806,31 +795,33 @@ dt {
     font-size: 60px;
 }
 
-section {
-  max-width: 750px;
-  padding: 30px 0px 50px 0px;
-  margin: 20px 0;
-  margin-top: 70px;
+#tagline {
+text-align: center;
+font-weight: bolder;
+color: white;
+margin-top: 20px;
 }
-section #title {
-  border: 0;
-  outline: none;
-  margin: 0 0 50px 0;
-  padding: 0 0 5px 0;
+
+#downloads li {
+  list-style: none;
+  line-height: 2;
+  font-weight: bolder;
+  list-style-position: outside;
+  margin-left: -18px;
 }
-section #title h1 {
-  font-family: 'OpenSansLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: normal;
-  font-size: 80px;
+
+#title {
+  margin-top: 15px;
+  background: rgb(20,20,20);
   text-align: center;
+  position: relative;
+  padding-bottom: 10px;
 }
-section #title p {
-  color: #d7cfbe;
-  font-family: 'OpenSansLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: normal;
-  font-size: 18px;
-  text-align: center;
+
+#title h1 {
+    font-size: 160px;
 }
+
 section #title .credits {
   font-size: 11px;
   font-family: 'OpenSansRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;

@@ -20,7 +20,9 @@ var app = app || {};
                     view.$el.toggle(show);
                 },
                 "collection.change:completed" : function(model, value) {
-                    this.filterOne(this.findWithEventObject(model));
+                    if (this.app.get('filter')) {
+                        this.filterOne(this.findWithEventObject(model));
+                    }
                 },
                 "app.change:filter" : function() {
                     this.each(this.filterOne, this);

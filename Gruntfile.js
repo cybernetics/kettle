@@ -36,14 +36,14 @@ module.exports = function(grunt) {
             'specs/eventListeners.js',
             'specs/viewSubs.js',
             'specs/loader.js',
+            'specs/builders.js',
+            'specs/parsers.js',
+            'specs/kettle.js',
             'specs/element.js',
             'specs/view.js',
             'specs/domValue.js',
             'specs/collectionView.js',
-            'specs/containerView.js',
-            'specs/builders.js',
-            'specs/parsers.js',
-            'specs/kettle.js'
+            'specs/containerView.js'
           ]
         }
       }

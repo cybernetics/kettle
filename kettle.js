@@ -66,6 +66,25 @@
     }
 
 
+    var defer = (function() {
+        var defered = null;
+
+        var run = function() {
+            for (var i=0, j = defered.length; i<j; i++) {
+                defered[i]();
+            }
+            defered = null;
+        };
+
+        return function(fn) {
+            if (defered == null) {
+                defered = [];
+                setTimeout(run, 0);
+            }
+            defered.push(fn);
+        };
+    }());
+
     if (typeof exports !== 'undefined') {
         Kettle = exports;
     } else {
@@ -432,7 +451,7 @@
                 });
             }
 
-            return this.stopListening(view, 'change', this._onViewChange);
+            return this.stopListening(view);
         },
 
 
@@ -484,18 +503,17 @@
 
         //unsubscribe from all view events for all added views in the collection
         _stopListeningToViewEvents: function () {
-            var eventObjects, i, l, prop;
+            var eventObjects, eventObject, i, l, prop;
             if (this._viewsubs) {
                 eventObjects = this._viewsubs.eventObjects;
                 for (prop in eventObjects) {
                     for (i=0, l=eventObjects[prop].length; i<l; i++) {
-                        EventInterface.unbindEvent(eventObjects[prop][i], this);
+                        eventObject = eventObjects[prop][i];
+                        EventInterface.unbindEvent(eventObject, this);
+                        this.stopListening(eventObject);
                     }
                 }
             }
-
-
-            this.stopListening(null, 'change', this._onViewChange);
 
             return this;
         },
@@ -555,8 +573,15 @@
         remove: function (options) {
             var silent = options ? options.silent : false;
 
-            this.$el.remove();
-            this.unsubscribe();
+            this.$el.detach();
+            defer(_.bind(function() {
+                this.unsubscribe('el');
+                this.$el.remove();
+            }, this));
+
+            for (var name in this.eventObjects) {
+                if (name !== 'el') this.unsubscribe(name);
+            }
 
             if (!silent) {
                 this.trigger('remove', this);
@@ -1203,27 +1228,7 @@
     //used for things like setting up 2-way binding, subscribe elements to events, etc.
     var builders = (function() {
 
-        var PLACEHOLDER = '{name}',
-            deffered = null;
-
-        //Dom events are deffered as to not block the initial render
-        //binding a large amount of dom events (typically during 2-way binding)
-        //seems to take a signifcant amount of time.
-        function addDefferedEvent(obj, subFn, eventName, event, fn) {
-            if (!deffered) {
-                deffered = [];
-
-                setTimeout(function() {
-                    _.each(deffered, function(d) {
-                        d.obj[d.subFn](d.eventName, d.event, d.fn);
-                    });
-
-                    deffered = null;
-                },0);
-            }
-
-            deffered.push({obj: obj, subFn: subFn, fn: fn, eventName : eventName, event: event});
-        }
+        var PLACEHOLDER = '{name}';
 
         function getElsWithAttr($template, attr) {
             var els = {},
@@ -1239,7 +1244,9 @@
         function subscribeEvent(element, eventObjectName, event, attribute, fn, subFn) {
             if (attribute === PLACEHOLDER) attribute = element.name;
             if (eventObjectName === 'el') {
-                addDefferedEvent(element, subFn, eventObjectName, event, fn);
+                defer(function(){
+                    element[subFn]('el', event, fn);
+                });
             } else {
                 element[subFn](eventObjectName, attribute ? event + ':' + attribute : event, fn);
             }
@@ -1302,7 +1309,9 @@
             }
 
             if (domEvent != null) {
-                addDefferedEvent(domValue, 'subscribe', 'el', domEvent, fromDOM);
+                defer(function() {
+                    domValue.subscribe('el', domEvent, fromDOM);
+                });
             }
         }
 

@@ -28,12 +28,12 @@ describe("Event Interface: ", function() {
 
         });
 
-        it("binds a $ event", function() {
-            var ev = $(document.body);
+        it("binds a el event", function() {
+            var ev = document.body;
             e.bindEvent(ev, context, 'test', fn);
-            ev.trigger('test');
+            helpers.triggerDomEvent(ev,'test');
             expect(result).toBe(1);
-            ev.off();
+            e.unbindEvent(ev, context, 'test', fn);
         });
     });
 
@@ -57,25 +57,25 @@ describe("Event Interface: ", function() {
             expect(result).toBe(0);
         });
 
-        it("unbinds a $ event", function() {
-            var ev = $(document.body);
+        it("unbinds a el event", function() {
+            var ev = document.body;
             e.bindEvent(ev, context, 'test', incResult);
             e.unbindEvent(ev, context, 'test', incResult);
-            ev.trigger('test');
+            helpers.triggerDomEvent(ev, 'test');
             expect(result).toBe(0);
         });
 
-        it("uses a $ event with context", function() {
-            var ev = $(document.body);
+        it("uses a el event with context", function() {
+            var ev = document.body;
             var c1 = {}, c2 = {};
             e.bindEvent(ev,c1, 'test', incResult);
             e.bindEvent(ev,c2, 'test', incResult);
 
-            ev.trigger('test');
+            helpers.triggerDomEvent(ev, 'test');
             expect(result).toBe(2);
 
             e.unbindEvent(ev, c1, 'test', incResult);
-            ev.trigger('test');
+            helpers.triggerDomEvent(ev, 'test');
             expect(result).toBe(3);
         })
     });

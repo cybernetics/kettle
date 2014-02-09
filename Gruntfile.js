@@ -30,7 +30,8 @@ module.exports = function(grunt) {
       kettle : {
        src: ['kettle.js' ,'<%= jshint.files %>'],
         options: {
-          vendor: ['lib/jquery-1.9.1/jquery.min.js', 'lib/backbone-1.0/underscore.js', 'lib/backbone-1.0/backbone.js'],
+          helpers: ['specs/helpers.js'],
+          vendor: ['specs/helpers.js','lib/jquery-1.9.1/jquery.min.js', 'lib/backbone-1.0/underscore.js', 'lib/backbone-1.0/backbone.js'],
           specs: [
             'specs/eventInterface.js',
             'specs/eventListeners.js',

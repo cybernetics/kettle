@@ -127,7 +127,6 @@ describe("DomValue Builder: ", function() {
     beforeEach(function() {
         $elem = $('<input></input>');
         domValue = new Kettle.DomValue({ el : $elem});
-        jasmine.Clock.useMock();
     });
 
     it("applies the 2-way bindings", function() {
@@ -149,8 +148,8 @@ describe("DomValue Builder: ", function() {
 
         model.set('foo', null);
         expect(domValue.$el.val()).toBe('');
-        jasmine.Clock.tick(5);
-        domValue.$el.val('foo').trigger('change');
+        domValue.$el.val('foo');
+        helpers.triggerDomEvent(domValue.el, 'change');
         expect(model.get('foo')).toBe('foo');
     });
 
@@ -172,10 +171,11 @@ describe("DomValue Builder: ", function() {
 
         model.set('foo', null);
         expect(domValue.$el.val()).toBe('');
-        jasmine.Clock.tick(5);
-        domValue.$el.val('foo').trigger('keyup');
+        domValue.$el.val('foo');
+        helpers.triggerDomEvent(domValue.el, 'keyup');
         expect(model.get('foo')).toBe('foo');
-        domValue.$el.val('foo2').trigger('change');
+        domValue.$el.val('foo2');
+        helpers.triggerDomEvent(domValue.el,'change');
         expect(model.get('foo')).toBe('foo2');
     });
 
@@ -192,8 +192,8 @@ describe("DomValue Builder: ", function() {
         model.set('foo', 'bar');
 
         expect(domValue.$el.val()).toBe('bar');
-        jasmine.Clock.tick(5);
-        domValue.$el.val('foo').trigger('change');
+        domValue.$el.val('foo');
+        helpers.triggerDomEvent(domValue.el,'change');
         expect(model.get('foo')).toBe('foo');
     });
 
@@ -210,8 +210,8 @@ describe("DomValue Builder: ", function() {
         model.set('foo', 'bar');
 
         expect(domValue.$el.val()).toBe('bar');
-        jasmine.Clock.tick(5);
-        domValue.$el.val('foo').trigger('keyup');
+        domValue.$el.val('foo');
+        helpers.triggerDomEvent(domValue.el, 'keyup');
         expect(model.get('foo')).toBe('foo');
     });
 
@@ -259,7 +259,7 @@ describe("CollectionView Builder: ", function() {
     });
 
     it("creates a view given a constructor", function() {
-        var View = Kettle.View.extend({el : "<div></div>"});
+        var View = Kettle.View.extend({el : $("<div></div>")});
         var model = new Backbone.Model();
         var collection = new Backbone.Collection();
 

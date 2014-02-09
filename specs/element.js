@@ -179,9 +179,9 @@ describe("Element: ", function() {
 
   describe("when removed", function() {
     it("remove element form the dom", function() {
-      spyOn(element.$el,'remove').andCallThrough();
+      document.body.appendChild(element.el);
       element.remove();
-      expect(element.$el.remove).toHaveBeenCalled();
+      expect(element.el.parentNode).not.toBe(document.body);
     });
 
     it("unsubscribe from all model events", function() {
@@ -235,7 +235,7 @@ describe("Element: ", function() {
 describe("when an element is removed", function() {
     it("triggers a remove event", function() {
         var ran = false;
-        var e = new Kettle.Element({el : $()})
+        var e = new Kettle.Element({el : $('<div></div>')})
         e.on('remove', function() {ran = true});
         e.remove();
         expect(ran).toBe(true);
@@ -243,7 +243,7 @@ describe("when an element is removed", function() {
 
     it("stops listening to events", function() {
         var ran = true;
-        var e = new Kettle.Element({el : $()});
+        var e = new Kettle.Element({el : $('<div></div>')});
         e.on('test', function() {ran = true});
         e.remove();
         e.trigger('test');

@@ -191,7 +191,7 @@ describe("CollectionView: ", function() {
         result = true;
       }).subscribeViews('el', 'click', function() {result2 = true});
       subView1.trigger('test');
-      subView1.$el.click();
+      helpers.triggerDomEvent(subView1.el, 'click');
       expect(result).toBe(true);
       expect(result2).toBe(true);
     });
@@ -322,7 +322,7 @@ describe("CollectionView: ", function() {
         collectionView.subscribeViews('el', 'test', function() {
             elran = true;
         });
-        bbv1.$el.trigger('test');
+        helpers.triggerDomEvent(bbv1.el, 'test');
         expect(elran).toBe(true);
       });
 

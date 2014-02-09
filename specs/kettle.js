@@ -9,12 +9,6 @@ describe("When extending an Element" , function() {
         expect((new E).el).toBe(document.body);
     });
 
-    it("accepts html as the el", function() {
-        var html = "<div><span></span></div>"
-        var E = Kettle.Element.extend({el : html });
-        expect((new E).el.innerHTML).toBe("<span></span>");
-    });
-
     it("clones the el if its a script tag", function() {
         var el = function() {return $("<script><div><span></span></div></script>")};
         var E = Kettle.Element.extend({el : el});
@@ -32,8 +26,8 @@ describe("When extending an Element" , function() {
 
 describe("When constructing an element", function() {
     it("uses the passed in element instead of the element on the constructor, if one is passed in", function() {
-        var el = 'body';
-        var el2 = "<div></div>";
+        var el = $('body')[0];
+        var el2 = $("<div></div>")[0];
 
         var E = Kettle.Element.extend({el: el});
         var e = new E({el : el2});

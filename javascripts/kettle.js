@@ -56,7 +56,7 @@
 
             if (!ran) {
                 ran = true;
-                setTimeout(function(){
+                window.setTimeout(function(){
                     fn.apply(context, args);
                     context = args = null;
                     ran = false;
@@ -65,25 +65,12 @@
         };
     }
 
-
-    var defer = (function() {
-        var defered = null;
-
-        var run = function() {
-            for (var i=0, j = defered.length; i<j; i++) {
-                defered[i]();
-            }
-            defered = null;
+    function bind(fn, context) {
+        return function() {
+            fn.apply(context, arguments);
         };
+    }
 
-        return function(fn) {
-            if (defered == null) {
-                defered = [];
-                setTimeout(run, 0);
-            }
-            defered.push(fn);
-        };
-    }());
 
     if (typeof exports !== 'undefined') {
         Kettle = exports;
@@ -110,16 +97,16 @@
             return this;
         },
         bindEvent : function(obj, context, event, fn, attribute) {
-            if (obj instanceof Backbone.$) {
-                obj.on(event, this._proxy(fn, context));
+            if (_.isElement(obj)) {
+                $.addEvent(obj, event, this._proxy(fn, context));
             } else {
                 obj.on(attribute ? event + ":" + attribute : event, fn, context);
             }
         },
 
         unbindEvent : function(obj, context, event, fn , attribute) {
-            if (obj instanceof Backbone.$) {
-                fn ? obj.off(event, this._unproxy(fn, context)) : obj.off(event);
+            if (_.isElement(obj)) {
+                $.removeEvent(obj, event, this._unproxy(fn, context));
             } else {
                 obj.off(attribute ? event + ":" + attribute : event, fn, context);
             }
@@ -224,7 +211,7 @@
             }
 
             if (!proxied) {
-                proxied = _.bind(fn, context);
+                proxied = bind(fn, context);
                 fn[key] != null || (fn[key] = this._fid++);
                 context[key] != null || (context[key] = this._fid++);
                 this._proxies[fn[key] +' '+ context[key]] = proxied;
@@ -539,18 +526,18 @@
     var Element = function(params) {
             var el = params.el;
 
-            if (el instanceof Backbone.$) {
+            if (Backbone.$ && el instanceof Backbone.$) {
                 this.el = el[0];
                 this.$el = el;
             } else {
                 this.el = el;
-                this.$el = Backbone.$(el);
+                if (Backbone.$) this.$el = Backbone.$(el);
 
             }
 
-            this.eventObjects = {el: this.$el};
+            this.eventObjects = {el: this.el};
 
-            this._subs = new EventListeners(this).add('el', this.$el);
+            this._subs = new EventListeners(this).add('el', this.el);
 
     };
 
@@ -573,21 +560,14 @@
         remove: function (options) {
             var silent = options ? options.silent : false;
 
-            this.$el.detach();
-            defer(_.bind(function() {
-                this.unsubscribe('el');
-                this.$el.remove();
-            }, this));
-
-            for (var name in this.eventObjects) {
-                if (name !== 'el') this.unsubscribe(name);
-            }
+            $.remove(this.el);
+            this.unsubscribe();
 
             if (!silent) {
                 this.trigger('remove', this);
             }
 
-            return this.off().stopListening();
+            return this.stopListening();
         },
 
         //the default render method runs through all the subscriptions bootstraping relevant
@@ -615,7 +595,7 @@
                 oldEventObject = this.eventObjects[name] || null,
                 subs = this._subs;
 
-            if (name === 'el' && eventObject && eventObject !== this.$el) throwError("cannot change eventObject 'el'");
+            if (name === 'el' && eventObject && eventObject !== this.el) throwError("cannot change eventObject 'el'");
             if (eventObject && this.eventTypes[name] && !(eventObject instanceof this.eventTypes[name])) {
                 throwError("Invalid event object set, does not pass object validaiton");
             }
@@ -794,92 +774,38 @@
         // access the textContent/innerText.
         val : function(v) {
             if (!arguments.length) {
-                return this._get();
+                return $[this._fnName](this.el);
             }
 
-            this._set(v);
+            $[this._fnName](this.el,v);
 
             return this;
         },
 
-        _valGet : function() {
-            return this.el.value;
-        },
-
-        _valSet : function(v) {
-            this.el.value =  v;
-        },
-
-        _textGetIE : function() {
-            return this.el.innerText;
-        },
-
-        _textSetIE: function(v) {
-            this.el.innerText = v;
-        },
-
-        _textGet : function() {
-            return this.el.textContent;
-        },
-
-        _textSet : function(v) {
-            this.el.textContent = v;
-        },
-
-        _checkboxGet: function() {
-            return !!this.el.checked;
-        },
-
-        _checkboxSet : function(v) {
-            this.el.checked = !!v;
-        },
-
-        _imgGet : function() {
-            return this.el.src;
-        },
-
-        _imgSet : function(v) {
-            this.el.src =  v;
-        },
-
-        _selectGet : function() {
-            return this.$el.val();
-        },
-
-        _selectSet : function(v) {
-            this.$el.val(v);
-        },
-
-        _get : function() {},
-
-        _set: function() {},
-
         _findFn: function() {
-            var type, tag = this.el.tagName;
+            var type, fnName,
+                tag = $.getTag(this.el);
 
             if (tag === 'INPUT') {
-                type = this.el.getAttribute('type');
+                type = $.attr(this.el, 'type');
                 if ((type === 'radio' || type === 'checkbox')) {
-                    this._get = this._checkboxGet;
-                    this._set = this._checkboxSet;
+                    fnName = 'checked';
                 } else {
-                    this._get = this._valGet;
-                    this._set = this._valSet;
+                    fnName = 'inputVal';
                 }
             } else if (tag === 'TEXTAREA' || tag === 'SELECT') {
-                this._get = this._valGet;
-                this._set = this._valSet;
+                fnName = 'inputVal';
+            } else if (tag === 'SELECT') {
+                fnName = 'selectVal';
             } else if (tag === 'IMG') {
-                this._get = this._imgGet;
-                this._set = this._imgSet;
-            } else if (this.el.textContent !== undefined) {
-                this._get = this._textGet;
-                this._set = this._textSet;
+                fnName = 'src';
             } else {
-                this._get = this._textGetIE;
-                this._set = this._textSetIE;
+                fnName = 'text';
             }
-        }
+
+            this._fnName = fnName;
+        },
+        _fnName: null
     });
 
     //An element that can hold n views, views that are added the collectionView
@@ -910,7 +836,7 @@
             this.insert(view, index);
 
             if (this.emptyView) {
-                this.emptyView.$el.detach();
+                $.remove(this.emptyView.el);
             }
 
             this.bootstrapViewSubscriptions(view);
@@ -926,7 +852,7 @@
             this.subviews = [];
 
             if (this.emptyView) {
-                this.$el.append(this.emptyView.$el);
+                $.append(this.el, this.emptyView.el);
             }
 
             return this;
@@ -948,7 +874,7 @@
         //finds a given view who's element matches the passed in DOM element.
         findWithElement : function(el) {
 
-            if (el instanceof Backbone.$) {
+            if (Backbone.$ && el instanceof Backbone.$) {
                 el = el[0];
             }
 
@@ -962,12 +888,12 @@
         },
         //The method called to insert the view, can be override for custom behaviour
         insert: function(view, index) {
-            var children = this.el.childNodes;
+            var children = $.children(this.el);
 
             if (children && children.length && children.length !== index) {
-                this.el.insertBefore(view.el, children[index]);
+                $.insertBefore(this.el, view.el, children[index] );
             } else {
-                this.el.appendChild(view.el);
+                $.append(this.el, view.el);
             }
 
             return this;
@@ -977,6 +903,7 @@
         remove: function () {
             this.empty();
             CollectionView.__super__.remove.call(this);
+            this.off();
             if (this.emptyView) {
                 this.emptyView.remove();
             }
@@ -990,10 +917,11 @@
 
             if (index >= 0) {
                 this.subviews.splice(index, 1);
-                view.$el.detach();
+                $.remove(view.el);
+                view.off('remove', this.removeView, this);
                 this._removeViewEventObject(view);
                 if (this.subviews.length === 0 && this.emptyView) {
-                    this.$el.append(this.emptyView.$el);
+                    $.append(this.el, this.emptyView.el);
                 }
             }
             return this;
@@ -1003,7 +931,8 @@
         setEmptyView : function(emptyview) {
             this.emptyView = emptyview;
             if (this.subviews.length === 0) {
-                this.$el.empty().append(this.emptyView.$el);
+                $.empty(this.el);
+                $.append(this.el, this.emptyView.el);
             }
             return this;
         },
@@ -1065,7 +994,7 @@
                 model = models[i];
                 if (model !== this.subviews[i].eventObjects[this._target.model]) {
                     view = this.findWithEventObject(model, this._target.model);
-                    this.$el.children().eq(i).before(view.$el);
+                    $.insertBefore(this.el, view.el, $.children(this.el)[i]);
                 }
             }
 
@@ -1100,7 +1029,7 @@
             ContainerView.__super__.constructor.call(this, el);
         },
         insert: function(view) {
-            this.$el.append(view.$el);
+            $.append(this.el, view.el);
             return this;
         },
         empty: function() {
@@ -1167,16 +1096,17 @@
         //than the template will be the innerHTML of this views' DOM element.
         setTemplate: function(template) {
             if (template === true) {
-                this._template = this.template(_.unescape(this.el.innerHTML));
-                this.el.innerHTML = '';
+                this._template = this.template(_.unescape($.html(this.el)));
+                $.empty(this.el);
             } else if (_.isString(template)) {
-                this._template = this.template(Backbone.$(template).html());
+                var t = $.html($.select(template));
+                this._template = this.template(t);
             } else {
                 this._template = template;
             }
         },
         render : function() {
-            this.el.innerHTML = this._template(this.serialize());
+            $.html(this.el, this._template(this.serialize()));
             return this;
         },
         serialize : function() {
@@ -1194,7 +1124,7 @@
         constructor : function(params) {
             Backbone.View.prototype.constructor.apply(this, arguments);
             this.eventObjects = {};
-            this.eventObjects.el = this.$el;
+            this.eventObjects.el = this.el;
             this.eventObjects.view = this;
             if (this.model) this.eventObjects.model = this.model;
             if (this.collection) this.eventObjects.collection = this.collection;
@@ -1228,28 +1158,25 @@
     //used for things like setting up 2-way binding, subscribe elements to events, etc.
     var builders = (function() {
 
-        var PLACEHOLDER = '{name}';
+        var PLACEHOLDER = '{name}',
+            EVENT_SPLITTER = /\s+/;
 
-        function getElsWithAttr($template, attr) {
-            var els = {},
-                selector = "["+attr+"]";
+        function getElsWithAttr(template, attr) {
+            var els = {}, i, l, el,
+                selector = "["+attr+"]",
+                elements = $.selectAll(selector, template);
 
-            _.each(document.querySelectorAll ? $template[0].querySelectorAll(selector) : $template.eq(0).find(selector), function(el) {
-                els[el.getAttribute(attr)] = el;
-            });
+            for (i = 0, l = elements.length; i < l; i++) {
+                el = elements[i];
+                els[$.attr(el,attr)] = el;
+            }
 
             return els;
         }
 
         function subscribeEvent(element, eventObjectName, event, attribute, fn, subFn) {
             if (attribute === PLACEHOLDER) attribute = element.name;
-            if (eventObjectName === 'el') {
-                defer(function(){
-                    element[subFn]('el', event, fn);
-                });
-            } else {
-                element[subFn](eventObjectName, attribute ? event + ':' + attribute : event, fn);
-            }
+            element[subFn](eventObjectName, attribute ? event + ':' + attribute : event, fn);
         }
 
         function subscribeEvents (element, bindings, subFn) {
@@ -1280,7 +1207,7 @@
         //simple method that takes care of basic 2-way binding
         function bindDomValue(domValue, binding) {
             var time, name, attribute, bindingSplit, domEvent, fromDOM, fromModel, type,
-                tag = domValue.el.tagName;
+                tag = $.getTag(domValue.el);
 
             name = binding.eventObject;
             attribute = binding.attribute;
@@ -1302,16 +1229,17 @@
                 if (tag === 'SELECT') domEvent = 'change';
                 else if (tag === 'TEXTAREA') domEvent = 'change keyup';
                 else if (tag === 'INPUT') {
-                    type = domValue.el.getAttribute('type');
+                    type = $.attr(domValue.el, 'type');
                     if (!type || type === 'text') domEvent = 'change keyup';
                     else domEvent = 'change';
                 }
             }
 
             if (domEvent != null) {
-                defer(function() {
-                    domValue.subscribe('el', domEvent, fromDOM);
-                });
+                bindingSplit = domEvent.split(EVENT_SPLITTER);
+                for (var i = 0, l = bindingSplit.length; i < l; i++) {
+                    domValue.subscribe('el', bindingSplit[i], fromDOM);
+                }
             }
         }
 
@@ -1319,7 +1247,7 @@
             view : function (view, buildParams) {
                 var el, element, buildData, name,
                     attr = buildParams.attr,
-                    els = getElsWithAttr(view.$el, attr),
+                    els = getElsWithAttr(view.el, attr),
                     defaults = buildParams.defaults;
 
                 for (name in buildParams.elements) {
@@ -1921,7 +1849,7 @@
                     params || (params = {});
                     var prop,
                         eventObjects = _.extend({}, Kettle._globalEventObjects, params.eventObjects),
-                        selector = (params.el || this._el) || "<div></div>",
+                        selector = (params.el || this._el) || $.create("<div></div>"),
                         el = Kettle.getEl(selector),
                         render = params.render == null ? true : params.render,
                         eventTypes = this.eventTypes;
@@ -1973,6 +1901,122 @@
             return event;
         }
     }
+
+    var $ = (function() {
+        var useJquery = !document.addEventListener || !document.querySelectorAll;
+
+        return {
+            clone : function(elem) {
+                return elem.cloneNode(true);
+            },
+            select: function(selector, from) {
+                if (useJquery) {
+                    return from ? Backbone.$(from).find(selector)[0] : Backbone.$(selector)[0];
+                }
+                from = from || document;
+                return from.querySelector(selector);
+            },
+            selectAll : function(selector, from) {
+                if (useJquery) {
+                    return from ? Backbone.$(from).find(selector) : Backbone.$(selector);
+                }
+                from = from || document;
+                return from.querySelectorAll(selector);
+            },
+            addEvent : function(elem, event, fn) {
+                useJquery ? Backbone.$(elem).on(event, fn) : elem.addEventListener(event, fn);
+            },
+            removeEvent : function(elem, event, fn) {
+                useJquery ? Backbone.$(elem).off(event, fn) : elem.removeEventListener(event, fn);
+            },
+            remove : function(elem) {
+                if (useJquery) {
+                    Backbone.$(elem).detach();
+                } else {
+                    if (elem.parentNode != null) {
+                        elem.parentNode.removeChild(elem);
+                    }
+                }
+            },
+            create : function(html) {
+                var div = document.createElement('div');
+                div.innerHTML = html;
+                return div.firstChild;
+            },
+            attr : function(elem, attr, value) {
+                if (arguments.length >= 3){
+                    elem.setAttribute(attr, value);
+                    return value;
+                }
+
+                return elem.getAttribute(attr);
+            },
+            inputVal : function(elem, value) {
+                if (arguments.length >= 2) {
+                    return elem.value = value;
+                }
+
+                return elem.value;
+            },
+            html : function(elem, value) {
+                if (arguments.length >= 2) {
+                    return elem.innerHTML = value;
+                }
+
+                return elem.innerHTML;
+            },
+            empty : function(elem) {
+                $.html(elem, '');
+            },
+            text : function(elem, value) {
+                var tc = elem.textContent !== undefined;
+                if (arguments.length >= 2) {
+                    if(tc) {
+                        return elem.textContent = value;
+                    }else {
+                        Backbone.$(elem).text(value);
+                        return value;
+                    }
+                }
+
+                return tc ? elem.textContent : Backbone.$(elem).text();
+            },
+            src : function(elem, value) {
+                if (arguments.length >= 2) {
+                    return elem.src = value;
+                }
+
+                return elem.src;
+            },
+            checked : function(elem, value) {
+                if (arguments.length >= 2) {
+                    return elem.checked = !!value;
+                }
+
+                return !!elem.checked;
+            },
+            selectVal: function(elem, value) {
+                if (arguments.length >= 2) {
+                    useJquery ? Backbone.$(elem).val(value) : (elem.value = value);
+                    return value;
+                }
+
+                return useJquery ? Backbone.$(elem).val() : elem.options[elem.selectedIndex].value;
+            },
+            getTag : function(elem) {
+                return elem.tagName;
+            },
+            append : function(parent, newchild) {
+                parent.appendChild(newchild);
+            },
+            insertBefore: function(parent, newchild, child) {
+                parent.insertBefore(newchild, child);
+            },
+            children : function(elem) {
+                return elem.childNodes;
+            }
+        };
+    }());
 
     _.extend(Kettle, {
         VERSION: "0.1.0",
@@ -2036,17 +2080,17 @@
                 meta = this._elCache[selector];
             } else {
                 meta = {clone : false};
-                meta.el = Backbone.$(selector)[0];
+                meta.el = $.select(selector);
                 if (meta.el == null) throwError("Element not found with selector: "+selector);
-                if (meta.el.tagName === 'SCRIPT') {
-                    meta.el = Backbone.$(trim(meta.el.innerHTML))[0];
+                if ($.getTag(meta.el) === 'SCRIPT') {
+                    meta.el = $.create(trim($.html(meta.el)));
                     meta.clone = true;
                 }
 
                 cache[selector] = meta;
             }
 
-            return meta.clone ? Backbone.$(meta.el).clone()[0] : meta.el;
+            return meta.clone ? $.clone(meta.el) : meta.el;
         },
         _globalEventObjects: {},
         _elCache: {},

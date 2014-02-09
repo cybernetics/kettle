@@ -903,6 +903,7 @@
         remove: function () {
             this.empty();
             CollectionView.__super__.remove.call(this);
+            this.off();
             if (this.emptyView) {
                 this.emptyView.remove();
             }
@@ -917,6 +918,7 @@
             if (index >= 0) {
                 this.subviews.splice(index, 1);
                 $.remove(view.el);
+                view.off('remove', this.removeView, this);
                 this._removeViewEventObject(view);
                 if (this.subviews.length === 0 && this.emptyView) {
                     $.append(this.el, this.emptyView.el);

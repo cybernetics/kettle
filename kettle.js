@@ -56,7 +56,7 @@
 
             if (!ran) {
                 ran = true;
-                setTimeout(function(){
+                window.setTimeout(function(){
                     fn.apply(context, args);
                     context = args = null;
                     ran = false;

@@ -202,10 +202,10 @@ describe("Element parsers: ", function() {
                     {
                         bindings:[
                             {name:'y',event:'a',attribute:undefined},
-                            {name:'y',event:'b',attribute:undefined},
+                            {name:'y',event:'b',attribute:undefined}
                         ],
                         fn:[fn, fn]
-                    },
+                    }
                 ]
             });
     });
@@ -217,10 +217,10 @@ describe("Element parsers: ", function() {
                     {
                         bindings:[
                             {name:'y',event:'a',attribute:undefined},
-                            {name:'y',event:'b',attribute:undefined},
+                            {name:'y',event:'b',attribute:undefined}
                         ],
                         fn:[fn, fn]
-                    },
+                    }
                 ],
                 eventsviewsDebounced: [
                     {

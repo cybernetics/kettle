@@ -148,7 +148,7 @@ describe("CollectionView: ", function() {
         var $el = $(html);
         collectionView.setEmptyView(new Kettle.View({ el : $el}));
         collectionView.empty();
-        expect(collectionView.$el.html()).toBe(html);
+        expect(collectionView.$el.html().toUpperCase()).toBe(html.toUpperCase());
     });
   });
 
@@ -177,9 +177,9 @@ describe("CollectionView: ", function() {
         var html = "<div>Empty View</div>";
         var $el = $(html);
         collectionView.setEmptyView(new Kettle.View({ el : $el}));
-        expect(collectionView.$el.html()).toBe(html);
+        expect(collectionView.$el.html().toUpperCase()).toBe(html.toUpperCase());
         collectionView.addView(subView1).removeView(subView1);
-        expect(collectionView.$el.html()).toBe(html);
+        expect(collectionView.$el.html().toUpperCase()).toBe(html.toUpperCase());
     });
   });
 
